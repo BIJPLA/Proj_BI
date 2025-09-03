@@ -1,3 +1,25 @@
+
+// === Helpers: trocar IFrame sem alterar layout ===
+function _extractSrc(html) {
+  const m = html.match(/src\s*=\s*['"]([^'"]+)['"]/i);
+  return m ? m[1] : null;
+}
+function _swapIframe(container, html) {
+  const newSrc = _extractSrc(html);
+  const existing = container.querySelector('iframe');
+  if (existing && newSrc) {
+    // Apenas troca o src para manter exatamente o mesmo layout/estilos
+    if (existing.getAttribute('src') !== newSrc) {
+      existing.setAttribute('src', newSrc);
+    }
+    return existing;
+  }
+  // Se não existe iframe atual, insere o fornecido como está
+  // (preserva atributos/estilo originais do projeto)
+  container.insertAdjacentHTML('beforeend', html);
+  return container.querySelector('iframe');
+}
+
 const permissoes = {
   "Finanças": [
     { nome: "Dashboard Medição", iframe: `<iframe title="Dashboard - OMIE" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNTAxZjk5YmEtODRhMy00ZWZkLWE2NjktNzNhZWE3YWMxYjBiIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'` },
@@ -18,9 +40,13 @@ const permissoes = {
   { nome: "Dahsboard - Caçambas", iframe: '<iframe title="Lista de Motoristas - Terra" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYjE4NGViNzQtNmNiNS00NTk3LWE5NzUtYzVkY2IwYTc5OWI0IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'}
   ],
   "CS": [
-    {nome: "Planejamento", inframe: '<iframe title="Planejamento - Landapp" width="1140" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=1301a2cd-5009-49d6-8fe5-89b506ce22d1&autoAuth=true&ctid=b7567895-10cc-49be-9241-37e572266fef" frameborder="0" allowFullScreen="true"></iframe>'},
+    {nome: "Planejamento", iframe: '<iframe title="Planejamento - Landapp" width="1140" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=1301a2cd-5009-49d6-8fe5-89b506ce22d1&autoAuth=true&ctid=b7567895-10cc-49be-9241-37e572266fef" frameborder="0" allowFullScreen="true"></iframe>'},
+    {nome: "S&OP", iframe: '<iframe title="S&OP - Landapp" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMTBkMTI1YjItYjY2Mi00NzY3LWE1OWQtOTliMjZlMTE1NGEzIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'}
   ],
-  "Marketing": []
+  "Marketing": [
+     {nome: "Remarketing", iframe: '<iframe title="Remarketing" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNTZmMTRmYTAtN2RlZi00NWY2LWE1NjUtMGU1ZTIxODFiMTQxIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'},
+     {nome:"Credito de Carbono", iframe: '<iframe title="Dashboard - Neutralização" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMzQxZTU3MTAtYzg0Mi00NzMyLTlkY2EtOTNkNGJlM2NmZTBmIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'}
+  ],
 };
 
 const container = document.getElementById("departamentos");
@@ -37,7 +63,12 @@ for (let depto in permissoes) {
       b.className = "nav-item";
       b.textContent = d.nome;
       b.onclick = () => {
-        dashArea.innerHTML += d.iframe;
+        // Limpa apenas o conteúdo (iframe) antigo, preservando títulos/botões existentes
+        // Mantém layout intacto
+        const frames = dashArea.querySelectorAll('iframe');
+        frames.forEach((f, i) => { if (i === 0) return; f.remove(); }); // segurança: remove extras se existirem
+        // Troca/insere o iframe
+        _swapIframe(dashArea, d.iframe);
       };
       dashArea.appendChild(b);
     });

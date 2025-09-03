@@ -85,12 +85,16 @@ body {
   color: #333;
 }
 #dashboards .nav-item {
-  background-color: #d14c00;
-  margin-bottom: 10px;
-  border-radius: 6px;
-  padding: 10px 15px;
-  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: #f15500;
   color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  width: auto;
 }
 iframe {
   width: 100%;
@@ -122,8 +126,10 @@ iframe {
 
 #dashboards {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 10px;
+  align-items: center;
 }
 
 #dashboards .button-group {
@@ -169,3 +175,4 @@ iframe {
   cursor: pointer;
   width: auto !important;
 }
+#dashboards h3 { width: 100%; margin-bottom: 10px; }
