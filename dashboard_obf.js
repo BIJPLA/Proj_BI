@@ -154,7 +154,7 @@
       if (regraBruta === "todos") return permissoesBase;
 
       const resultado = {};
-      const tokens = regraBruta.split(",").map(p => p.trim()).filter(Boolean);
+      const tokens = regraBruta.split("|").map(p => p.trim()).filter(Boolean);
 
       tokens.forEach(token => {
         let depToken = token;
