@@ -24,7 +24,13 @@ function login() {
       const usuario = rows.find(l => l[emailIdx]?.trim() === email && l[senhaIdx]?.trim() === senha);
       if (usuario) {
         sessionStorage.setItem("logado", "true");
-        window.location.href = "dashboard.html";
+        sessionStorage.setItem("email", email);
+        const loginScreen = document.getElementById("login-screen");
+        const dashScreen = document.getElementById("dashboard-screen");
+        if (loginScreen && dashScreen) {
+          loginScreen.style.display = "none";
+          dashScreen.style.display = "flex";
+        }
       } else {
         document.getElementById("error-msg").innerText = "Usuário ou senha inválidos.";
       }
@@ -33,3 +39,12 @@ function login() {
       document.getElementById("error-msg").innerText = "Erro ao validar login.";
     });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  const loginScreen = document.getElementById("login-screen");
+  const dashScreen = document.getElementById("dashboard-screen");
+  if (sessionStorage.getItem("logado") === "true" && loginScreen && dashScreen) {
+    loginScreen.style.display = "none";
+    dashScreen.style.display = "flex";
+  }
+});
