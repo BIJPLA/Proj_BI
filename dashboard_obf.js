@@ -187,7 +187,7 @@
     container.innerHTML = "";
     dashArea.innerHTML = "";
 
-    const fonte = window.permissoesAtuais || permissoesBase;
+    const fonte = window.permissoesAtuais || {};
 
     for (let dep in fonte) {
       if (!Object.prototype.hasOwnProperty.call(fonte, dep)) continue;
@@ -218,14 +218,15 @@
     }
   }
 
-  // ========= Carregar permissões ao entrar =========
+  
+// ========= Carregar permissões controlado pelo script de login =========
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    const email = sessionStorage.getItem("email");
-    if (email) {
-      const perms = await _carregarPermissoesUsuario(email);
-      if (perms) window.permissoesAtuais = perms;
-    }
-    montarDepartamentos();
-  });
+document.addEventListener("DOMContentLoaded", () => {
+  // fluxo controlado em script.js
+});
+
+// Exporta funções para uso no script de login
+window._carregarPermissoesUsuario = _carregarPermissoesUsuario;
+window._montarDepartamentosDashboard = montarDepartamentos;
+
 })();
