@@ -67,7 +67,7 @@
     "Log Fretes": [
       {
         nome: "Lista de Motoristas",
-        iframe: `<iframe title="Lista de Motoristas - Fretes" width="1140" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=e2328ceb-1207..." frameborder="0"></iframe>`
+        iframe: `<iframe title="Lista de Motoristas - Fretes" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiY2M4YzAzZjYtOGIxOS00YmRhLWEyYmEtZjdiOGRlMjhmYjMxIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       }
     ],
 
