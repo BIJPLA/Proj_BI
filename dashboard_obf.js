@@ -37,15 +37,15 @@
       },
       {
         nome: "Auditoria Modal",
-        iframe: `<iframe title="Auditoria - Modal" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMjhkNWQxMW1..." frameborder="0"></iframe>`
+        iframe: `<iframe title="Auditória - Modal" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMjhkNWQ1MmYtNmVkMS00MzlmLTk0ZWMtYjc4YTVjMzg3YjFjIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
         nome: "Forecast",
-        iframe: `<iframe title="Forecast" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNjAx..." frameborder="0"></iframe>`
+        iframe: `<iframe title="Forecast" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYjI3NGY1YmMtMDdlMy00ZjNlLTkxODUtZTk2MWNmMDE2ZTY3IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
         nome: "DRE",
-        iframe: `<iframe title="DRE" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiN2M0..." frameborder="0"></iframe>`
+        iframe: `<iframe title="DRE - BI" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiN2M0MzFlYWYtNjEzNy00OWJjLWFmNDMtY2UwM2I3ZGYzOTRhIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       }
     ],
 
@@ -64,34 +64,33 @@
 
     "Log Terra": [
       {
-        nome: "Dashboard - Caçambas",
-        iframe: `<iframe title="Lista de Motoristas - Terra" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiWW..." frameborder="0"></iframe>`
-      },
-      {
-        nome: "Reta Final - 2025",
-        iframe: `<iframe title="Reta Final - 2025" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiWW1..." frameborder="0"></iframe>`
-      }
-    ],
-
-    "CS": [
-      {
-        nome: "Planejamento",
-        iframe: `<iframe title="Planejamento - Landapp" width="1140" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=1301a2cd..." frameborder="0"></iframe>`
+        nome: "Dashboard - Terra",
+        iframe: `<iframe title="Lista de Motoristas - Terra" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYzhhOGMyMmYtZGZhNS00MzkwLWI4MTItMjU3MzZjZmM2MzZiIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
         nome: "S&OP",
-        iframe: `<iframe title="S&OP - Landapp" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiTUI..." frameborder="0"></iframe>`
+        iframe: `<iframe title="S&OP 2.0 - Landapp" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYzZhZjlhYWYtODhkZC00NjY3LWE3MTMtZmY2NTY0YzQ1ODU1IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
+      },
+      {
+        nome: "Omie",
+        iframe: `<iframe title="Dashboard - Medicao" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNmEyMGIyNzctZGM3Yi00ZjAxLWJiMWUtOTRjYTA2NDk5ZTdmIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       }
     ],
 
     "Marketing": [
       {
         nome: "Remarketing",
-        iframe: `<iframe title="Remarketing" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNTZ..." frameborder="0"></iframe>`
+        iframe: `<iframe title="Remarketing" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNTZmMTRmYTAtN2RlZi00NWY2LWE1NjUtMGU1ZTIxODFiMTQxIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
         nome: "Crédito de Carbono",
-        iframe: `<iframe title="Dashboard - Neutralização" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjo..." frameborder="0"></iframe>`
+        iframe: `<iframe title="Dashboard - Neutralização" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMzQxZTU3MTAtYzg0Mi00NzMyLTlkY2EtOTNkNGJlM2NmZTBmIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
+      }
+    ],
+    "Reta Final": [
+            {
+        nome: "Reta Final",
+        iframe: `<iframe title="Reta Final - 2025" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMmU1MDRlODUtYmQxMi00Y2NhLTgzZTQtMmEyOTI3N2VlZTAyIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       }
     ]
   };
