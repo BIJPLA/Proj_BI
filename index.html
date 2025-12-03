@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    <!--MATERIAL-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <style>
+    .material-symbols-outlined {
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+      font-size: 20px;
+      vertical-align: middle;
+    }
+    </style>
+    
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LandApp - Dashboards</title>
@@ -66,7 +80,7 @@
 
   <div id="login-screen">
 <div class="login-box">
-    <img src="https://admin.landapp.com.br/logo/svg/black.svg" alt="LandApp Logo Central">
+    <img src="Imagens/Logo_Plataforma_Preto.png" alt="LandApp Logo Central" style="transform:scale(1.6);transform-origin:center;">
     <input type="text" id="email" placeholder="Usuário">
     <input type="password" id="senha" placeholder="Senha">
     <button onclick="login()">Entrar</button>
@@ -77,9 +91,9 @@
   <div id="dashboard-screen" class="dashboard-layout" style="display:none">
 <div class="sidebar">
     <a href="index.html" class="a-logo">
-      <img alt="LandApp Logo" class="logo" src="https://admin.landapp.com.br/logo/svg/white.svg"/>
+      <img alt="LandApp Logo" class="logo" src="Imagens/Logo_Plataforma_Branco.png"/ style="transform:scale(1.6);transform-origin:center;">
     </a>
-    <h3 class="title">Dashboards - LandApp</h3>
+    <h3 class="title"></h3>
     <div id="departamentos"></div>
   </div>
 

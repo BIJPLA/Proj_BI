@@ -26,25 +26,25 @@
   // ======== Tabela fixa de dashboards ========
 
   const permissoesBase = {
-    "💲 Finanças": [
+    "Finanças": [
       {
-        nome: "📐 Dashboard Medição",
+        nome: "Dashboard Medição",
         iframe: `<iframe title="Dashboard - OMIE" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNTAxZjk5YmEtODRhMy00ZWZkLWE2NjktNzNhZWE3YWMxYjBiIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
-        nome: "📋 Auditoria Fretes",
+        nome: "Auditoria Fretes",
         iframe: `<iframe title="Auditoria - Fretes" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZWViODNkNmQtNTBiZC00YTFlLWE0NTYtNjkzOWU1M2IzMWFlIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
-        nome: "🔎 Auditoria Modal",
+        nome: "Auditoria Modal",
         iframe: `<iframe title="Auditória - Modal" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMjhkNWQ1MmYtNmVkMS00MzlmLTk0ZWMtYjc4YTVjMzg3YjFjIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
-        nome: "📈 Forecast",
+        nome: "Forecast",
         iframe: `<iframe title="Forecast" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYjI3NGY1YmMtMDdlMy00ZjNlLTkxODUtZTk2MWNmMDE2ZTY3IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
-        nome: "📊 DRE",
+        nome: "DRE",
         iframe: `<iframe title="DRE - BI" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiN2M0MzFlYWYtNjEzNy00OWJjLWFmNDMtY2UwM2I3ZGYzOTRhIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       }
     ],
@@ -79,14 +79,20 @@
 
     "Marketing": [
       {
-        nome: "Remarketing",
-        iframe: `<iframe title="Remarketing" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNTZmMTRmYTAtN2RlZi00NWY2LWE1NjUtMGU1ZTIxODFiMTQxIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
+        nome: "Ranking",
+        iframe: `<iframe title="Dashboard - MKT" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNTdjMTY2ZjktZGUxZi00OTIyLTkxYzYtOWIxNmY0NzY3ZmVmIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
         nome: "Crédito de Carbono",
         iframe: `<iframe title="Dashboard - Neutralização" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMzQxZTU3MTAtYzg0Mi00NzMyLTlkY2EtOTNkNGJlM2NmZTBmIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
+      },
+      {
+        nome: "Remarketing",
+        iframe: `<iframe title="Remarketing" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNTZmMTRmYTAtN2RlZi00NWY2LWE1NjUtMGU1ZTIxODFiMTQxIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       }
+
     ],
+
     "Reta Final": [
             {
         nome: "Reta Final",
@@ -168,6 +174,23 @@
 
   // ========= UI =========
 
+  
+  
+
+function getIcon(dep) {
+  const map = {
+    "Finanças": `<span class="material-symbols-outlined">payments</span>`,
+    "Comercial": `<span class="material-symbols-outlined">trending_up</span>`,
+    "Marketing": `<span class="material-symbols-outlined">campaign</span>`,
+    "Log Terra": `<span class="material-symbols-outlined">front_loader</span>`,
+    "Log Fretes": `<span class="material-symbols-outlined">local_shipping</span>`,
+    "CS": `<span class="material-symbols-outlined">handshake</span>`,
+    "Reta Final": `<span class="material-symbols-outlined">handshake</span>`
+  };
+  return map[dep] || "";
+}
+
+
   const container = document.getElementById("departamentos");
   const dashArea = document.getElementById("dashboards");
 
@@ -184,7 +207,7 @@
 
       const btn = document.createElement("a");
       btn.className = "nav-item";
-      btn.innerHTML = `<i class="fas fa-chart-bar"></i> ${dep}`;
+      btn.innerHTML = `${getIcon(dep)} ${dep}`;
 
       btn.onclick = () => {
         dashArea.innerHTML = `<h3>${dep}</h3>`;
@@ -192,7 +215,23 @@
         fonte[dep].forEach(d => {
           const b = document.createElement("a");
           b.className = "nav-item";
-          b.textContent = d.nome;
+          b.innerHTML=(function(){if(d.nome=="Dashboard Medição") return `<span class="material-symbols-outlined">square_foot</span> Dashboard Medição `;
+            if(d.nome=="Auditoria Fretes") return `<span class="material-symbols-outlined">fact_check</span> Auditoria Fretes `;
+            if(d.nome=="Auditoria Modal") return `<span class="material-symbols-outlined">alt_route</span> Auditoria Modal`;
+            if(d.nome=="Forecast") return `<span class="material-symbols-outlined">trending_up</span> Forecast`;
+            if(d.nome=="DRE") return `<span class="material-symbols-outlined">dashboard</span> DRE`;
+            if(d.nome=="Omie") return `<span class="material-symbols-outlined">square_foot</span> Omie`;
+            if(d.nome=="Reta Final") return `<span class="material-symbols-outlined">star</span> Reta Final`;
+            if(d.nome=="Lista de Motoristas") return `<span class="material-symbols-outlined">local_shipping</span> Lista de motoristas`;
+            if(d.nome=="Key Accont") return `<span class="material-symbols-outlined">crown</span> Key Accont`;
+            if(d.nome=="CSI 2.0") return `<span class="material-symbols-outlined">feature_search</span> CSI 2.0`;
+            if(d.nome=="Gerencial") return `<span class="material-symbols-outlined">gite</span> Gerencial`;
+            if(d.nome=="S&OP") return `<span class="material-symbols-outlined">calendar_month</span> S&OP`;
+            if(d.nome=="Dashboard - Terra") return `<span class="material-symbols-outlined">front_loader</span> Dashboard - Terra`;
+            if(d.nome=="Remarketing") return `<span class="material-symbols-outlined">digital_out_of_home</span> Remarketing`;
+            if(d.nome=="Crédito de Carbono") return `<span class="material-symbols-outlined">eco</span> Crédito de Carbono`;
+            if(d.nome=="Ranking") return `<span class="material-symbols-outlined">social_leaderboard</span> Ranking`;
+            return d.nome;})();
 
           b.onclick = () => {
             const frames = dashArea.querySelectorAll("iframe");

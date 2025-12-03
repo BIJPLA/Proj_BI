@@ -176,3 +176,16 @@ iframe {
   width: auto !important;
 }
 #dashboards h3 { width: 100%; margin-bottom: 10px; }
+
+
+.sidebar .a-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.sidebar .a-logo img {
+  display: block;
+  margin: 0 auto;
+}
