@@ -54,6 +54,12 @@
     { nome: "Key Accont", iframe: '<iframe title="Dash_Keyaccount" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYzk0MWNhZDctZjQ4Yi00MGQ3LTk2NzItZmY5MmFhZDI0YjE0IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>' },
     { nome: "CSI 2.0", iframe: '<iframe title="CSI - 2.0" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZjViMWYwODgtYzNjZC00NWI2LWEwNjgtYTlkMzRiMDA4N2E4IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>' },
   ],
+    "People": [
+      { nome: "Swile", iframe: '<iframe title="Dashboard - People" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMGQ2OGEwZjItMmIwNS00ODFmLTliNjEtNWM3N2I5YzM5M2VhIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'},
+  ],
+    "Tech": [
+      { nome: "Validação", iframe: '<iframe title="Dash_Gerencial_2.0" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZTMzZTdlOGUtY2UxOC00MTY0LTgzNDItNzRhODNmZmMyOTZlIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'},
+  ],
 
     "Log Fretes": [
       {
@@ -185,6 +191,8 @@ function getIcon(dep) {
     "Log Terra": `<span class="material-symbols-outlined">front_loader</span>`,
     "Log Fretes": `<span class="material-symbols-outlined">local_shipping</span>`,
     "CS": `<span class="material-symbols-outlined">handshake</span>`,
+    "People": `<span class="material-symbols-outlined">article_person</span>`,
+    "Tech": `<span class="material-symbols-outlined">developer_mode_tv</span>`,
     "Reta Final": `<span class="material-symbols-outlined">handshake</span>`
   };
   return map[dep] || "";
@@ -230,6 +238,7 @@ function getIcon(dep) {
             if(d.nome=="Dashboard - Terra") return `<span class="material-symbols-outlined">front_loader</span> Dashboard - Terra`;
             if(d.nome=="Remarketing") return `<span class="material-symbols-outlined">digital_out_of_home</span> Remarketing`;
             if(d.nome=="Crédito de Carbono") return `<span class="material-symbols-outlined">eco</span> Crédito de Carbono`;
+            if(d.nome=="Swile") return `<span class="material-symbols-outlined">assignment_ind</span> Swile`;
             if(d.nome=="Ranking") return `<span class="material-symbols-outlined">social_leaderboard</span> Ranking`;
             return d.nome;})();
 
