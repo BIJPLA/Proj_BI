@@ -240,6 +240,7 @@ function getIcon(dep) {
             if(d.nome=="Remarketing") return `<span class="material-symbols-outlined">digital_out_of_home</span> Remarketing`;
             if(d.nome=="Crédito de Carbono") return `<span class="material-symbols-outlined">eco</span> Crédito de Carbono`;
             if(d.nome=="Swile") return `<span class="material-symbols-outlined">assignment_ind</span> Swile`;
+            if(d.nome=="Budget") return `<span class="material-symbols-outlined">money_range</span> Budget`;
             if(d.nome=="Ranking") return `<span class="material-symbols-outlined">social_leaderboard</span> Ranking`;
             return d.nome;})();
 
