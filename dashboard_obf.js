@@ -78,6 +78,10 @@
         nome: "Dashboard - Terra",
         iframe: `<iframe title="Lista de Motoristas - Terra" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYzhhOGMyMmYtZGZhNS00MzkwLWI4MTItMjU3MzZjZmM2MzZiIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
+       {
+        nome: "Acompanhamento de Metas - Terra",
+        iframe: `<iframe title="Dashboard - Metas - oficial" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMjViZGZkYzktYzNmMy00MTYxLTg0OWItNjcxMzIzZDQwZGE0IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
+      },
       {
         nome: "S&OP",
         iframe: `<iframe title="S&OP 2.0 - Landapp" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYzZhZjlhYWYtODhkZC00NjY3LWE3MTMtZmY2NTY0YzQ1ODU1IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
@@ -235,7 +239,7 @@ function getIcon(dep) {
             if(d.nome=="DRE") return `<span class="material-symbols-outlined">dashboard</span> DRE`;
             if(d.nome=="Omie") return `<span class="material-symbols-outlined">square_foot</span> Omie`;
             if(d.nome=="Reta Final") return `<span class="material-symbols-outlined">star</span> Reta Final`;
-            if(d.nome=="Lista de Motoristas") return `<span class="material-symbols-outlined">local_shipping</span> Lista de motoristas`;
+            if(d.nome=="Dashboard - Fretes") return `<span class="material-symbols-outlined">local_shipping</span> Dashboard - Fretes`;
             if(d.nome=="Key Accont") return `<span class="material-symbols-outlined">crown</span> Key Accont`;
             if(d.nome=="CSI 2.0") return `<span class="material-symbols-outlined">feature_search</span> CSI 2.0`;
             if(d.nome=="Gerencial") return `<span class="material-symbols-outlined">gite</span> Gerencial`;
@@ -244,7 +248,8 @@ function getIcon(dep) {
             if(d.nome=="Remarketing") return `<span class="material-symbols-outlined">digital_out_of_home</span> Remarketing`;
             if(d.nome=="Crédito de Carbono") return `<span class="material-symbols-outlined">eco</span> Crédito de Carbono`;
             if(d.nome=="Swile") return `<span class="material-symbols-outlined">assignment_ind</span> Swile`;
-            if(d.nome=="Acompanhamento de Metas - Fretes") return `<span class="material-symbols-outlined">star</span> Acompanhamento de Metas - Fretes`;     
+            if(d.nome=="Acompanhamento de Metas - Fretes") return `<span class="material-symbols-outlined">star</span> Acompanhamento de Metas - Fretes`;
+            if(d.nome=="Acompanhamento de Metas - Terra") return `<span class="material-symbols-outlined">star</span> Acompanhamento de Metas - Terra`; 
             if(d.nome=="Budget") return `<span class="material-symbols-outlined">money_range</span> Budget`;
             if(d.nome=="Ranking") return `<span class="material-symbols-outlined">social_leaderboard</span> Ranking`;
             return d.nome;})();
