@@ -64,8 +64,12 @@
 
     "Log Fretes": [
       {
-        nome: "Lista de Motoristas",
+        nome: "Dashboard - Fretes",
         iframe: `<iframe title="Lista de Motoristas - Fretes" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiY2M4YzAzZjYtOGIxOS00YmRhLWEyYmEtZjdiOGRlMjhmYjMxIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
+      },
+      {
+        nome: "Acompanhamento de Metas - Fretes",
+        iframe: '<iframe title="Dashboard - Metas - Fretes" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZjAzZjgwZDYtNTE1OS00MjUyLThiY2EtYTc0NmRkODBiN2JiIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'
       }
     ],
 
@@ -240,6 +244,7 @@ function getIcon(dep) {
             if(d.nome=="Remarketing") return `<span class="material-symbols-outlined">digital_out_of_home</span> Remarketing`;
             if(d.nome=="Crédito de Carbono") return `<span class="material-symbols-outlined">eco</span> Crédito de Carbono`;
             if(d.nome=="Swile") return `<span class="material-symbols-outlined">assignment_ind</span> Swile`;
+            if(d.nome=="Acompanhamento de Metas - Fretes") return `<span class="material-symbols-outlined">star</span> Acompanhamento de Metas - Fretes`;     
             if(d.nome=="Budget") return `<span class="material-symbols-outlined">money_range</span> Budget`;
             if(d.nome=="Ranking") return `<span class="material-symbols-outlined">social_leaderboard</span> Ranking`;
             return d.nome;})();
