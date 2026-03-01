@@ -546,7 +546,7 @@ if (window.matchMedia){
  * UI: campo acima do mapa (index.html)
  * Observação: se o navegador bloquear CORS, rode via backend/proxy.
  */
-const GEMINI_API_KEY = "AIzaSyDuSOBOLtMsAdZd0Fwi2KVu-Xw2k0fflbY";
+const GEMINI_API_KEY = "AIzaSyBjEMQHVv-sSMvV2jdYYnz-h2vlea5XWJc";
 const GEMINI_MODEL = "gemini-2.5-flash"; // docs: ai.google.dev
 
 const aiQuestionEl = document.getElementById("aiQuestion");
