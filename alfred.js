@@ -5,7 +5,7 @@
    ============================= */
 
 (function(){
-  const GEMINI_API_KEY = "AIzaSyDuSOBOLtMsAdZd0Fwi2KVu-Xw2k0fflbY";
+  const GEMINI_API_KEY = "AIzaSyBjEMQHVv-sSMvV2jdYYnz-h2vlea5XWJc";
   const GEMINI_MODEL = "gemini-2.5-flash";
 
   function escapeHtmlToSafeText(s){
