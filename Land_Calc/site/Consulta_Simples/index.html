@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <link rel="icon" type="image/webp" href="https://storage.googleapis.com/ecdt-logo-saida/84518cf6d69507692e42894fd6b76885087d0de33b083ab4bbf13e2664725115/LANDAPP-TECHNOLOGY.webp">
+    
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Consulta Simples - Layout Detalhado</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://unpkg.com/leaflet/dist/leaflet.css" rel="stylesheet"/>
+<link href="Style_Destino.css" rel="stylesheet"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- SheetJS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- jsPDF AutoTable -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <a href="../index.html" class="a-logo">
+        <img alt="LandApp Logo" class="logo" src="https://admin.landapp.com.br/logo/svg/white.svg"/>
+    </a>
+    <h3 class="title">Calculadora - LandApp</h3>
+    <a href="../Consulta_Detalhada/index.html" class="a-links"><i class="fas fa-route"></i><span>Consulta Detalhada</span></a>
+    
+    <a href="../Consulta_Simples/index.html" class="a-links"><i class="fas fa-map"></i><span>Consulta Simples</span></a>
+
+<a href="https://www.google.com/maps/d/viewer?hl=pt-BR&amp;ll=-23.670005187062007%2C-46.61519475155053&amp;z=11&amp;mid=1JU0ah8Fp-5C-c78gYgvRSPTzbAqC0ALu" target="_blank" class="a-links">
+    <i class="fas fa-map"></i><span>Mapa LandApp</span>
+</a>
+</div>
+
+<div class="main">
+<div class="content">
+<h2>Consulta Entre Endereços</h2>
+<div class="card">
+
+    <label style="display:flex; align-items:center; font-weight:bold;">
+        <i class="fas fa-user" style="margin-right:8px;"></i>Nome da Origem:
+    </label>
+    <input id="nomeOrigem" type="text" placeholder="Digite o nome da origem">
+
+    <label style="display:flex; align-items:center; font-weight:bold;">
+        <i class="fas fa-map-marker-alt" style="margin-right:8px;"></i>Endereço da Origem:
+    </label>
+    <input id="enderecoOrigem" type="text" placeholder="Digite o endereço de origem">
+
+    <label style="display:flex; align-items:center; font-weight:bold;">
+        <i class="fas fa-user" style="margin-right:8px;"></i>Nome do Destino:
+    </label>
+    <input id="nomeDestino" type="text" placeholder="Digite o nome do destino">
+
+    <label style="display:flex; align-items:center; font-weight:bold;">
+        <i class="fas fa-map-marker-alt" style="margin-right:8px;"></i>Endereço do Destino:
+    </label>
+    <input id="enderecoDestino" type="text" placeholder="Digite o endereço de destino">
+
+    <button onclick="calcularRota()">Consultar</button>
+    <button onclick="exportarXLSX()"><i class="fas fa-file-excel"></i> Exportar XLSX</button>
+    <button onclick="exportarPDF()"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+
+    <div id="resultado" style="margin-top:20px;"></div>
+
+</div>
+<div id="map" style="width: 100%; height: 400px; margin-top:20px;"></div>
+</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+    <link rel="icon" type="image/webp" href="https://storage.googleapis.com/ecdt-logo-saida/84518cf6d69507692e42894fd6b76885087d0de33b083ab4bbf13e2664725115/LANDAPP-TECHNOLOGY.webp">
+    
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Calculadora Inteligente de KM</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://unpkg.com/leaflet/dist/leaflet.css" rel="stylesheet"/>
+<link href="Style_Destino.css" rel="stylesheet"/>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+</head>
+<body>
+
+
+
+<div class="sidebar">
+<a  href="../index.html" class="a-logo"><img alt="LandApp Logo" class="logo" src="https://admin.landapp.com.br/logo/svg/white.svg"/></a>
+    <h3 class="title">Calculadora - LandApp</h3>
+<a href="../Consulta_Detalhada/index.html" class="a-links"><i class="fas fa-route"></i><span>Consulta Detalhada</span></a>
+
+<a href="../Consulta_Simples/index.html" class="a-links"><i class="fas fa-map"></i><span>Consulta Simples</span></a>
+<a href="https://www.google.com/maps/d/viewer?hl=pt-BR&ll=-23.670005187062007%2C-46.61519475155053&z=11&mid=1JU0ah8Fp-5C-c78gYgvRSPTzbAqC0ALu" target="_blank" class="a-links">
+    <i class="fas fa-map"></i><span>Mapa LandApp</span>
+</a>
+
+
+</div>
+
+
+
+<div class="main">
+<div class="content">
+<h2>Consulta Detalhada de Destinação</h2>
+<div class="card"><div style="margin-bottom: 15px;"><label style="display: flex; align-items: center; font-weight: bold;"><i class="fas fa-building" style="margin-right: 8px;"></i>Nome da Obra:</label><input id="obra" placeholder="Digite o nome da obra" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;" type="text"/></div><div style="margin-bottom: 15px;"><label style="display: flex; align-items: center; font-weight: bold;"><i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i>Zona:</label><select id="zona" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;"><option value="Sul">Sul</option><option value="Norte">Norte</option><option value="Leste">Leste</option><option value="Oeste">Oeste</option></select></div><div style="margin-bottom: 15px;"><label style="display: flex; align-items: center; font-weight: bold;"><i class="fas fa-truck" style="margin-right: 8px;"></i>Equipamento:</label><select id="equipamento" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;"><option value="Grande Porte">Grande Porte</option><option value="Pequeno Porte">Pequeno Porte</option></select></div><div style="margin-bottom: 15px;"><label style="display: flex; align-items: center; font-weight: bold;"><i class="fas fa-map" style="margin-right: 8px;"></i>Região:</label><select id="regiao" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;"><option value="Bairro">Bairro</option><option value="Marginal">Marginal</option></select></div>
+<div style="margin-bottom: 15px;"><label style="display: flex; align-items: center; font-weight: bold;"><i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i>Endereço de Origem:</label><input id="end1" placeholder="Digite o endereço de origem" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;" type="text"/></div>
+<button onclick="calcularRotas()"><i class="fas fa-route"></i> Calcular Rotas</button>
+<button onclick="exportarXLSX()"><i class="fas fa-file-excel"></i> Exportar XLSX</button>
+<button onclick="exportarPDF()"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+<div id="resultadoBox" style="display:none;">
+<h3 id="tituloResultado" style="text-align: center; margin-bottom: 10px;"></h3>
+<p>✅ Cálculo realizado com sucesso!</p>
+
+<table id="tabelaResultados">
+
+<thead>
+<tr>
+  <th onclick="ordenarTabela(0)">Destino <i class="fas fa-sort"></i></th>
+  <th onclick="ordenarTabela(1)">Status <i class="fas fa-sort"></i></th>
+
+  <th onclick="ordenarTabela(2)">Distância <i class="fas fa-sort"></i></th>
+  <th onclick="ordenarTabela(3)">Duração <i class="fas fa-sort"></i></th>
+  <th onclick="ordenarTabela(4)">DMT <i class="fas fa-sort"></i></th>
+  <th onclick="ordenarTabela(5)">Preço <i class="fas fa-sort"></i></th>
+  <th onclick="ordenarTabela(6)">3 Km <i class="fas fa-sort"></i></th>
+  <th onclick="ordenarTabela(7)">5 Km <i class="fas fa-sort"></i></th>
+  <th onclick="ordenarTabela(8)">Rota <i class="fas fa-sort"></i></th>
+</tr>
+</thead>
+
+<tbody></tbody>
+</table>
+
+
+
+
+</div>
+<div id="map"></div>
+</div>
+</div>
+</div>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="Script_Destino.js"></script>
+
+
+
+
+
+
+<script>
+function exportarPDF() {
+  const titulo = document.getElementById("tituloResultado")?.innerText.trim() || "consulta_detalhada";
+  const nomeArquivo = titulo.replace(/[\/:*?"<>|]/g, '') + ".pdf";
+  const tabela = document.getElementById("tabelaResultados");
+  const linhas = tabela.querySelectorAll("tbody tr");
+
+  const pdf = new jspdf.jsPDF("p", "mm", "a4");
+  const pageWidth = pdf.internal.pageSize.getWidth();
+
+  // Cabeçalho colorido com título
+  pdf.setFillColor(255, 102, 0);
+  pdf.rect(0, 0, pageWidth, 20, 'F');
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(14);
+  pdf.text(titulo, pageWidth / 2, 12, { align: "center" });
+
+  // Configurações da tabela
+  const headers = ["Destino", "Status", "Distância", "Duração", "DMT", "Preço", "3 Km", "5 Km", "Rota"];
+  const colWidths = [30, 22, 22, 20, 15, 22, 22, 22, 30];
+  let startY = 30;
+  let rowHeight = 8;
+
+  // Cabeçalho da tabela
+  pdf.setFontSize(10);
+  pdf.setTextColor(0);
+  headers.forEach((header, i) => {
+    const x = 10 + colWidths.slice(0, i).reduce((a, b) => a + b, 0);
+    if (colWidths[i]) {
+      pdf.setFillColor(240, 240, 240);
+      pdf.rect(x, startY, colWidths[i], rowHeight, 'F');
+      pdf.setDrawColor(200);
+      pdf.rect(x, startY, colWidths[i], rowHeight);
+      pdf.text(header, x + 2, startY + 5);
+    }
+  });
+
+  startY += rowHeight;
+
+  // Linhas da tabela
+  linhas.forEach((linha) => {
+    const colunas = linha.querySelectorAll("td");
+    colunas.forEach((coluna, i) => {
+      const texto = coluna.innerText || "";
+      const x = 10 + colWidths.slice(0, i).reduce((a, b) => a + b, 0);
+      if (colWidths[i]) {
+        pdf.setDrawColor(220);
+        pdf.rect(x, startY, colWidths[i], rowHeight);
+        pdf.setTextColor(30);
+        pdf.text(texto.substring(0, 40), x + 2, startY + 5);
+      }
+    });
+    startY += rowHeight;
+
+    if (startY > 270) {
+      pdf.addPage();
+      startY = 20;
+    }
+  });
+
+  pdf.save(nomeArquivo);
+}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+

@@ -1,0 +1,27 @@
+
+html,body{margin:0;height:100%;font-family:Arial}
+.layout{display:grid;grid-template-columns:360px 1fr;height:100%}
+.sidebar{
+  background:hsl(222, 47%, 11%);
+  color:#fff;
+  padding:16px;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+}
+.logo{
+  text-align:center;
+  padding:12px 0 16px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+.logo img{max-width:160px}
+.menu{margin-top:16px}
+label{display:block;margin-top:10px;font-size:13px}
+select,input,button{
+  width:100%;
+  padding:8px;
+  margin-top:4px;
+  border-radius:6px;
+  border:none
+}
+#map{height:100%}

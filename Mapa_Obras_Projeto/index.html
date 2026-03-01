@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mapa de Obras</title>
+
+  <!-- Leaflet (mapa) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <aside class="sidebar">
+      <!-- Header fixo da Sidebar (logo + ações) -->
+      <div class="sidebar-header">
+        <!-- Logo vira botão Home -->
+        <button class="logo-home" id="btnHome" title="Home" aria-label="Home">
+          <img
+            id="sidebarLogo"
+            src="https://admin.landapp.com.br/logo/svg/white.svg"
+            data-logo-white="https://admin.landapp.com.br/logo/svg/white.svg"
+            data-logo-black="https://admin.landapp.com.br/logo/svg/black.svg"
+            alt="LandApp"
+          />
+        </button>
+
+        <div class="sidebar-actions">
+          <button class="icon-btn" id="btnToggleSidebar" title="Recolher/Expandir" aria-label="Recolher/Expandir">
+            <span class="icon" aria-hidden="true">≡</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Conteúdo que some quando a sidebar colapsa -->
+      <div class="sidebar-content">
+
+      <h1>Mapa de Obras</h1>
+      <div class="sub">Consulte informações de todas as Obras de Terra da LandApp, e qualquer duvida, pergunte ao Alfred🕵🏼😉</div>
+
+      <div class="card">
+        <div class="ai-bar" id="aiBar">
+          <div class="ai-bar-head">
+            <div class="ai-bar-title">🕵🏼Alfred</div>
+          </div>
+          <div class="ai-bar-row">
+            <input id="aiQuestion" placeholder="Pergunte algo sobre as obras, regiões, clientes, rotas, custos…" />
+            <button id="aiAskBtn" type="button">Perguntar</button>
+          </div>
+          <div class="ai-toggle-row">
+            <button id="aiToggleBtn" class="ai-toggle" type="button" title="Recolher/Expandir" aria-label="Recolher/Expandir">▾</button>
+          </div>
+          <div id="aiAnswer" class="ai-answer" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:700">Buscar proximidade</div>
+            <div class="tiny">Digite um endereço “referência” e veja quais obras estão dentro do raio.</div>
+          </div>
+          <span class="pill" id="countPill">0 obras</span>
+        </div>
+
+        <label>Novo endereço</label>
+        <input id="novoEndereco" placeholder="Ex: Av. Paulista, 1000 - São Paulo, SP" />
+
+        <div class="row">
+          <div>
+            <label>Raio (km)</label>
+            <input id="raioKm" type="number" min="0.1" step="0.1" value="5" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button id="btnFiltrar">Filtrar</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <button id="btnLimparProximidade" class="btn-secondary">Limpar filtro</button>
+          </div>
+          <div></div>
+        </div>
+
+        <div class="status" id="status">Carregando…</div>
+
+        <div class="legend">
+          <span class="dot base"></span><span>Obras</span>
+          <span class="dot near"></span><span>Obras no raio</span>
+          <span class="dot focus"></span><span>Novo endereço</span>
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:700">Filtros</div>
+            <div class="tiny">Esses filtros controlam quais obras aparecem no mapa e na lista.</div>
+          </div>
+          <span class="pill" id="filtroPill">Sem filtros</span>
+        </div>
+
+        <label>Cliente</label>
+        <input id="fCliente" list="dlCliente" placeholder="Todos" />
+        <datalist id="dlCliente"></datalist>
+
+        <label>Nome da Obra</label>
+        <input id="fObra" list="dlObra" placeholder="Todas" />
+        <datalist id="dlObra"></datalist>
+
+        <label>Destino</label>
+        <input id="fDestino" list="dlDestino" placeholder="Todos" />
+        <datalist id="dlDestino"></datalist>
+
+        <div class="row">
+          <div>
+            <label>Tipo</label>
+            <select id="fTipo">
+              <option value="">Todos</option>
+              <option value="CUT_VOLUME">Corte</option>
+              <option value="TRUCK_VOLUME">Caminhão</option>
+              <option value="RUBBLE_VOLUME">Entulho</option>
+            </select>
+          </div>
+          <div>
+            <label>Região</label>
+            <select id="fRegiao">
+              <option value="">Todas</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Bairro</label>
+        <input id="fBairro" placeholder="Ex: Indianópolis" />
+
+        <div class="row">
+          <div>
+            <button id="btnAplicarFiltros">Aplicar filtros</button>
+          </div>
+          <div>
+            <button id="btnLimparFiltros" class="btn-secondary">Limpar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:700">Lista de obras</div>
+        <div class="tiny">Clique em uma obra pra focar no mapa.</div>
+        <div class="list" id="listaObras"></div>
+      </div>
+
+      <div class="tiny">
+        Nota: o endereço novo é geocodificado via Nominatim (OpenStreetMap).
+        Se der “não achei”, coloca cidade/UF junto.
+      </div>
+
+      </div>
+    </aside>
+
+        <main class="map-container">
+      <div id="map"></div>
+    </main>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

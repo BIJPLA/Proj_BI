@@ -22,87 +22,123 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="style.css"/>
   <style>
-
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
+  body{
+    margin:0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg);
+    color: var(--text);
   }
-  #login-screen {
-    background-color: #f15500;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  #login-screen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: #ffffff;
   }
-
-
-    
-    #login-screen .login-box {
-      background: white;
-      padding: 40px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 360px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      text-align: center;
-    }
-    #login-screen .login-box img {
-      max-width: 234px;
-      margin-bottom: 30px;
-    }
-    #login-screen input, #login-screen button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 5px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    #login-screen input {
-      border: 1px solid #ccc;
-    }
-    #login-screen button {
-      background-color: #f15500;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    #login-screen #error-msg {
-      color: red;
-      margin-top: 10px;
-    }
-  
+  #login-screen .login-box{
+    width: 100%;
+    max-width: 420px;
+    padding: 34px 34px;
+    border-radius: 18px;
+    background: #ffffff;
+    border: 1px solid rgba(15,23,42,.10);
+    box-shadow: 0 18px 55px rgba(2,6,23,.10);
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap: 14px;
+  }
+  #login-screen .login-box img{
+    max-width: 240px;
+    margin: 8px 0 6px;
+    filter: none;
+  }
+  #login-screen input, #login-screen button{
+    width:100%;
+    padding: 12px 12px;
+    margin: 10px 0;
+    border-radius: 12px;
+    font-size: 15px;
+    box-sizing: border-box;
+    outline:none;
+  }
+  #login-screen input{
+    background: #ffffff;
+    border: 1px solid rgba(15,23,42,.14);
+    color: #0b1220;
+  }
+  #login-screen input::placeholder{ color: rgba(15,23,42,.55); }
+  #login-screen button{
+    background: linear-gradient(180deg, #0f1a2e, #0b1220);
+    color: white;
+    border: none;
+    cursor:pointer;
+    font-weight: 700;
+    transition: transform .14s ease, filter .14s ease;
+  }
+  #login-screen button:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+  #login-screen #error-msg{
+    color: #ff6b6b;
+    margin-top: 10px;
+    min-height: 18px;
+  }
   </style>
 </head>
 <body>
 <div id="loading-screen" style="position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;color:white;font-size:22px;z-index:999999;;display:none;">Validando permissões...</div>
 
   <div id="login-screen">
-<div class="login-box">
-    <img src="Imagens/Logo_Plataforma_Preto.png" alt="LandApp Logo Central" style="transform:scale(1.6);transform-origin:center;">
-    <input type="text" id="email" placeholder="Usuário">
-    <input type="password" id="senha" placeholder="Senha">
-    <button onclick="login()">Entrar</button>
-    <p id="error-msg"></p>
-  </div>
+    <div class="login-box">
+      <img src="Imagens/Logo_Plataforma_Preto.png" alt="Logo Plataforma" style="transform:scale(1.25);transform-origin:center;">
+      <input type="text" id="email" placeholder="Usuário">
+      <input type="password" id="senha" placeholder="Senha">
+      <button onclick="login()">Entrar</button>
+      <p id="error-msg"></p>
+    </div>
   </div>
 
   <div id="dashboard-screen" class="dashboard-layout" style="display:none">
-<div class="sidebar">
-    <a href="index.html" class="a-logo">
-      <img alt="LandApp Logo" class="logo" src="Imagens/Logo_Plataforma_Branco.png"/ style="transform:scale(1.6);transform-origin:center;">
-    </a>
-    <h3 class="title"></h3>
-    <div id="departamentos"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <a href="index.html" class="a-logo">
+          <img alt="LandApp Logo" class="logo" src="Imagens/Logo_Plataforma_Branco.png"/ style="transform:scale(1.6);transform-origin:center;">
+        </a>
+
+        <div class="user-row">
+          <div class="user-card">
+            <div class="user-avatar" id="userAvatar" title="Sua foto"><img id="userAvatarImg" alt="Foto do usuário"/></div>
+            <div class="user-meta">
+              <div class="user-name" id="userName">—</div>
+              <div class="user-role" id="userRole">—</div>
+            </div>
+          </div>
+
+          <button class="sidebar-toggle" id="sidebarToggle" aria-label="Recolher/expandir menu">
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Setores</div>
+        <div id="departamentos"></div>
+      </div>
+
+      <div class="sidebar-section alfred-sidebar">
+        <div class="sidebar-label">Alfred 🕵🏼</div>
+        <div id="alfredSidebarMount"></div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+      <div id="dashboards"></div>
+    </main>
   </div>
 
-  <div class="main-content" style="margin-left: 260px;">
-    <div id="dashboards"></div>
-  </div>
-  </div>
-
+  <script src="colaboradores.js"></script>
   <script src="script.js"></script>
+  <script src="alfred.js"></script>
   <script src="dashboard_obf.js"></script>
 </body>
 </html>

@@ -54,7 +54,9 @@
       { nome: "Gerencial", iframe: '<iframe title="Dash_Gerencial_2.0" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZTMzZTdlOGUtY2UxOC00MTY0LTgzNDItNzRhODNmZmMyOTZlIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'},
     { nome: "Key Accont", iframe: '<iframe title="Dash_Keyaccount" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYzk0MWNhZDctZjQ4Yi00MGQ3LTk2NzItZmY5MmFhZDI0YjE0IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>' },
     { nome: "CSI 2.0", iframe: '<iframe title="CSI - 2.0" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZjViMWYwODgtYzNjZC00NWI2LWEwNjgtYTlkMzRiMDA4N2E4IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>' },
-  ],
+      { nome: "Calculadora", tipo: "APP", iframe: `<iframe title="Calculadora - LandApp" src="apps/Land_Calc_Embed/index.html" frameborder="0" allowFullScreen="true" loading="lazy"></iframe>` },
+      { nome: "Land Map", tipo: "APP", iframe: `<iframe title="Land Map - LandApp" src="Mapa_Obras_Projeto/index.html" frameborder="0" allowFullScreen="true" loading="lazy"></iframe>` },
+],
     "People": [
       { nome: "Swile", iframe: '<iframe title="Dashboard - People" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMGQ2OGEwZjItMmIwNS00ODFmLTliNjEtNWM3N2I5YzM5M2VhIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'},
   ],
@@ -211,6 +213,34 @@ function getIcon(dep) {
   const container = document.getElementById("departamentos");
   const dashArea = document.getElementById("dashboards");
 
+  function getDashDesc(nome){
+    const map = {
+      "Dashboard Medição": "Acompanhamenoto de Medições pelo time de operações ",
+      "Auditoria Fretes": "Revisão das viagens de fretes realizdas.",
+      "Auditoria Modal": "Validações e visão por modal / tipo de equipamento.",
+      "Forecast": "Projeções e acompanhamento de Obras ( Receita e Volume)",
+      "DRE": "Demonstrativo de Resultados com visão gerencial.",
+      "Omie": "Visão financeira/ERP: lançamentos e integrações.",
+      "Reta Final": "Painel de foco: status, checklist e execução.",
+      "Dashboard - Fretes": "KPIs de fretes, produtividade, custos e margem.",
+      "Key Accont": "Visão por conta-chave: desempenho e oportunidades.",
+      "CSI 2.0": "Indicadores de satisfação e qualidade de atendimento.",
+      "Gerencial": "Panorama executivo: principais números e alertas.",
+      "S&OP": "Planejamento e execução: demanda, capacidade e ritmo.",
+      "Dashboard - Terra": "KPIs de terra, rotas, volume e eficiência.",
+      "Remarketing": "Leads, funil e performance de campanhas.",
+      "Crédito de Carbono": "Métricas ambientais e estimativas de impacto.",
+      "Swile": "People/benefícios: acompanhamento e indicadores.",
+      "Acompanhamento de Metas - Fretes": "Meta x realizado com cortes por período.",
+      "Acompanhamento de Metas - Terra": "Meta x realizado para terra e operação.",
+      "Budget": "Orçamento, variações e controle de despesas.",
+      "Ranking": "Ranking de performance: times, clientes e regiões.",
+      "Calculadora": "Calculadora LandApp: rotas, distância, exportações e mapa.",
+      "Land Map": "Mapa LandApp: obras, camadas e análises geográficas com sidebar completa."
+    };
+    return map[nome] || "Abrir dashboard e explorar indicadores.";
+  }
+
   function montarDepartamentos() {
     if (!container || !dashArea) return;
 
@@ -227,12 +257,13 @@ function getIcon(dep) {
       btn.innerHTML = `${getIcon(dep)} ${dep}`;
 
       btn.onclick = () => {
-        dashArea.innerHTML = `<h3>${dep}</h3>`;
+        dashArea.innerHTML = `<h3>${dep}</h3><div class="dash-grid" id="dashGrid"></div>`;
+        const grid = dashArea.querySelector('#dashGrid');
 
         fonte[dep].forEach(d => {
           const b = document.createElement("a");
-          b.className = "nav-item";
-          b.innerHTML=(function(){if(d.nome=="Dashboard Medição") return `<span class="material-symbols-outlined">square_foot</span> Dashboard Medição `;
+          b.className = "dashboard-card";
+          const iconAndTitle = (function(){if(d.nome=="Dashboard Medição") return `<span class="material-symbols-outlined">square_foot</span> Dashboard Medição `;
             if(d.nome=="Auditoria Fretes") return `<span class="material-symbols-outlined">fact_check</span> Auditoria Fretes `;
             if(d.nome=="Auditoria Modal") return `<span class="material-symbols-outlined">alt_route</span> Auditoria Modal`;
             if(d.nome=="Forecast") return `<span class="material-symbols-outlined">trending_up</span> Forecast`;
@@ -252,15 +283,45 @@ function getIcon(dep) {
             if(d.nome=="Acompanhamento de Metas - Terra") return `<span class="material-symbols-outlined">star</span> Acompanhamento de Metas - Terra`; 
             if(d.nome=="Budget") return `<span class="material-symbols-outlined">money_range</span> Budget`;
             if(d.nome=="Ranking") return `<span class="material-symbols-outlined">social_leaderboard</span> Ranking`;
+            if(d.nome=="Calculadora") return `<span class="material-symbols-outlined">calculate</span> Calculadora`;
+            if(d.nome=="Land Map") return `<span class="material-symbols-outlined">map</span> Land Map`;
             return d.nome;})();
+
+          // separa ícone e título (pra usar no card)
+          const tmp = document.createElement('div');
+          tmp.innerHTML = iconAndTitle;
+          const iconEl = tmp.querySelector('.material-symbols-outlined');
+          const iconName = iconEl ? (iconEl.textContent || 'dashboard').trim() : 'dashboard';
+          if (iconEl) iconEl.remove();
+          // IMPORTANTE: o texto do código do ícone (ex: front_loader) não pode grudar no título
+          const titleText = (tmp.textContent || d.nome || '').trim();
+          const iconHtml = `<span class="material-symbols-outlined">${iconName || 'dashboard'}</span>`;
+
+          const isApp = (d && (d.tipo === 'APP' || (d.nome || '') === 'Calculadora'));
+          const ctaRight = isApp ? 'LandApp App' : 'Power BI';
+
+          b.innerHTML = `
+            <div class="dash-head">
+              <div class="dash-icon">${iconHtml}</div>
+              <div>
+                <p class="dash-title">${titleText}</p>
+                <p class="dash-desc">${getDashDesc(titleText)}</p>
+              </div>
+            </div>
+            <div class="dash-cta">
+              <span class="pill"><span class="material-symbols-outlined">open_in_new</span> Abrir</span>
+              <span>${ctaRight}</span>
+            </div>
+          `;
 
           b.onclick = () => {
             const frames = dashArea.querySelectorAll("iframe");
             frames.forEach((f, i) => { if (i !== 0) f.remove(); });
-            _swapIframe(dashArea, d.iframe);
+             _swapIframe(dashArea, d.iframe);
+            try{ window.ALFRED && window.ALFRED.mountBelow && window.ALFRED.mountBelow(dashArea, { dep: dep, dash: titleText }); }catch(e){} 
           };
 
-          dashArea.appendChild(b);
+          (grid || dashArea).appendChild(b);
         });
       };
 
