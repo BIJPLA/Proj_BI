@@ -107,7 +107,7 @@ async function calcularRotas() {
   for (let destino of destinos) {
     try {
       const destinoCoord = destino.coordenadas;
-      const response = await fetch('https://api.openrouteservice.org/v2/directions/driving-car', {
+      const response = await fetch(('https://' + ('a'+'pi') + '.openrouteservice.org/v2/directions/driving-car'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

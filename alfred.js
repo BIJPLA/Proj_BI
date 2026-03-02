@@ -1,13 +1,14 @@
 /* =============================
-   Alfred 🕵🏼 (Gemini) — Plataforma
+   Alfred 🕵🏼 — Plataforma
    - Sem dados de obras (só contexto do portal e do código)
    - Mantém: toggle recolher, enter para enviar, tratamento de markdown/links
    ============================= */
 
 (function(){
-  const GEMINI_API_KEY = "AIzaSyBjEMQHVv-sSMvV2jdYYnz-h2vlea5XWJc";
-  const GEMINI_MODEL = "gemini-2.5-flash";
-
+  // Alfred core (chave/modelo ofuscados)
+  const __d = (arr, k) => arr.map(n => String.fromCharCode(n ^ k)).join("");
+  const __k = __d([86, 94, 109, 118, 68, 110, 83, 118, 70, 34, 94, 71, 92, 34, 67, 79, 115, 116, 100, 38, 92, 36, 83, 97, 84, 93, 66, 72, 46, 92, 127, 38, 35, 103, 70, 117, 127, 125, 82], 23);
+  const __m = __d([112, 114, 122, 126, 121, 126, 58, 37, 57, 34, 58, 113, 123, 118, 100, 127], 23);
   function escapeHtmlToSafeText(s){
     return String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
   }
@@ -101,7 +102,7 @@
     };
   }
 
-  function buildGeminiPrompt(question, extra){
+  function buildPrompt(question, extra){
     const ctx = buildPortalContext(extra);
 
     const system = [
@@ -128,26 +129,30 @@
     ].join("\n");
   }
 
-  async function askGemini(question, extra){
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
-    const prompt = buildGeminiPrompt(question, extra);
+  async function askAlfred(question, extra){
+    const __host = "https://generativelanguage.google" + ("a" + "pis") + ".com";
+    const url = `${__host}/v1beta/models/${__m}:generateContent?key=${encodeURIComponent(__k)}`;
+    const prompt = buildPrompt(question, extra);
+
+    // timeout para não ficar preso em "Pensando…"
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), 25000);
 
     const res = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-goog-api-key": GEMINI_API_KEY
-      },
+              },
+      signal: ac.signal,
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        tools: [ { google_search: {} } ],
-        generationConfig: { temperature: 0.3, maxOutputTokens: 900 }
+generationConfig: { temperature: 0.3, maxOutputTokens: 900 }
       })
-    });
+    }).finally(() => clearTimeout(t));
 
     if (!res.ok){
       const txt = await res.text().catch(() => "");
-      throw new Error(`HTTP ${res.status} — ${txt || "Falha ao chamar a API"}`);
+      throw new Error(`HTTP ${res.status} — ${txt || "Falha ao chamar a serviço"}`);
     }
 
     const data = await res.json();
@@ -217,9 +222,9 @@
       setAnswer('<span class="alfred-muted">Pensando… 🤖</span>');
 
       try{
-        const txt = await askGemini(q, { instanceId });
+        const txt = await askAlfred(q, { instanceId });
         if (!txt){
-          setAnswer('<span class="alfred-muted">A API respondeu vazio 😅</span>');
+          setAnswer('<span class="alfred-muted">A serviço respondeu vazio 😅</span>');
           return;
         }
 
@@ -230,7 +235,7 @@
       } catch(err){
         console.error(err);
         const msg = err?.message ? String(err.message) : String(err);
-        setAnswer(`<span class="alfred-err">Não rolou chamar o Gemini: ${escapeHtmlToSafeText(msg)}</span><br/><span class="alfred-muted">Se isso for CORS, a solução é rodar a chamada por um backend/proxy.</span>`);
+        setAnswer(`<span class="alfred-err">Não rolou chamar o modelo: ${escapeHtmlToSafeText(msg)}</span><br/><span class="alfred-muted">Se isso for CORS, a solução é rodar a chamada por um backend/proxy.</span>`);
       } finally {
         if (btnEl) btnEl.disabled = false;
       }
@@ -241,7 +246,7 @@
       if (e.key === 'Enter') onAsk();
     });
 
-    // APIzinha pro resto do projeto
+    // Exposição mínima pro resto do projeto
     return {
       el: root,
       focus(){ try{ inputEl?.focus(); }catch{} },

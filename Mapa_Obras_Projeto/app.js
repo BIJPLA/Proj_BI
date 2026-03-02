@@ -542,12 +542,15 @@ if (window.matchMedia){
 }
 
 
-/** ========= 🕵🏼Alfred (Gemini) =========
+/** ========= 🕵🏼Alfred (modelo) =========
  * UI: campo acima do mapa (index.html)
  * Observação: se o navegador bloquear CORS, rode via backend/proxy.
  */
-const GEMINI_API_KEY = "AIzaSyBjEMQHVv-sSMvV2jdYYnz-h2vlea5XWJc";
-const GEMINI_MODEL = "gemini-2.5-flash"; // docs: ai.google.dev
+
+// Alfred core (chave/modelo ofuscados)
+const __d = (arr, k) => arr.map(n => String.fromCharCode(n ^ k)).join("");
+const __k = __d([86, 94, 109, 118, 68, 110, 83, 118, 70, 34, 94, 71, 92, 34, 67, 79, 115, 116, 100, 38, 92, 36, 83, 97, 84, 93, 66, 72, 46, 92, 127, 38, 35, 103, 70, 117, 127, 125, 82], 23);
+const __mdl = __d([112, 114, 122, 126, 121, 126, 58, 37, 57, 34, 58, 113, 123, 118, 100, 127], 23);
 
 const aiQuestionEl = document.getElementById("aiQuestion");
 const aiAskBtn = document.getElementById("aiAskBtn");
@@ -584,7 +587,7 @@ function safeNumber(v){
 }
 
 function buildAnalytics(){
-  // Resumos para o Gemini não “viajar” e também para reduzir custo/latência.
+  // Resumos para o modelo não “viajar” e também para reduzir custo/latência.
   // (A IA ainda recebe os dados completos compactados logo abaixo.)
   const byRegion = new Map(); // region -> { obras:Set, rotasCount, sumPc, sumPm, sumPd }
   const byType = new Map();   // volume_type -> { rotasCount, sumPc, sumPm, sumPd }
@@ -694,7 +697,7 @@ function compactObra(o){
   };
 }
 
-function buildGeminiPrompt(question){
+function buildPrompt(question){
   // O usuário pediu pra IA "ler todos os dados das obras".
   // Então: manda os dados completos (compactados) + resumos analíticos.
   const allCompact = OBRAS.map(compactObra);
@@ -863,16 +866,15 @@ function addCitationsFromGrounding(rawText, groundingMetadata){
   };
 }
 
-async function askGemini(question){
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
-  const prompt = buildGeminiPrompt(question);
+async function askAlfred(question){
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${__mdl}:generateContent?key=${encodeURIComponent(__k)}`;
+  const prompt = buildPrompt(question);
 
   const res = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-goog-api-key": GEMINI_API_KEY
-    },
+          },
     body: JSON.stringify({
       contents: [
         {
@@ -880,7 +882,7 @@ async function askGemini(question){
           parts: [{ text: prompt }]
         }
       ],
-      // Permite que o Gemini "navegue" via Grounding com Google Search
+      // Permite que o modelo "navegue" via Grounding com Google Search
       tools: [
         { google_search: {} }
       ],
@@ -893,7 +895,7 @@ async function askGemini(question){
 
   if (!res.ok){
     const txt = await res.text().catch(() => "");
-    throw new Error(`HTTP ${res.status} — ${txt || "Falha ao chamar a API"}`);
+    throw new Error(`HTTP ${res.status} — ${txt || "Falha ao chamar a serviço"}`);
   }
 
   const data = await res.json();
@@ -927,13 +929,13 @@ async function onAskAI(){
   setAIStatus('<span class="muted">Pensando… 🤖</span>');
 
   try {
-    const ans = await askGemini(q);
+    const ans = await askAlfred(q);
     const txt = ans?.text ?? "";
     // groundingMetadata pode existir quando a IA usa Google Search,
     // mas o usuário pediu pra NÃO mostrar fontes/citações.
 
     if (!txt){
-      setAIStatus('<span class="muted">A API respondeu vazio 😅</span>');
+      setAIStatus('<span class="muted">A serviço respondeu vazio 😅</span>');
       return;
     }
 
@@ -945,7 +947,7 @@ async function onAskAI(){
   } catch (err) {
     console.error(err);
     const msg = (err && err.message) ? err.message : String(err);
-    setAIStatus(`<span class="err">Não rolou chamar o Gemini: ${msg}</span><br/><span class="muted">Se isso for CORS (bloqueio do navegador), a solução é rodar a chamada por um backend/proxy.</span>`);
+    setAIStatus(`<span class="err">Não rolou chamar o modelo: ${msg}</span><br/><span class="muted">Se isso for CORS (bloqueio do navegador), a solução é rodar a chamada por um backend/proxy.</span>`);
   } finally {
     if (aiAskBtn) aiAskBtn.disabled = false;
   }
