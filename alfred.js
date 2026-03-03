@@ -289,6 +289,13 @@ generationConfig: { temperature: 0.3, maxOutputTokens: 900 }
       belowInstance.setPlaceholder('Pergunte algo sobre ESTE dashboard…');
       belowInstance.setHint('Dica: pergunte sobre filtros, uso, ou o que você está vendo 👀');
       wrap.appendChild(belowInstance.el);
+    } else {
+      // Se o usuário abriu dashboards em outro setor, move o Alfred pra baixo do iframe atual
+      try{
+        if (belowInstance.el && belowInstance.el.parentNode !== wrap){
+          wrap.appendChild(belowInstance.el);
+        }
+      }catch{}
     }
 
     // Contexto extra (sem “perguntar” nada) — só deixa o placeholder mais esperto
