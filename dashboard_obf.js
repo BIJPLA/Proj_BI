@@ -218,7 +218,7 @@ function getIcon(dep) {
       "Dashboard Medição": "Acompanhamenoto de Medições pelo time de operações ",
       "Auditoria Fretes": "Revisão das viagens de fretes realizdas.",
       "Auditoria Modal": "Validações e visão por modal / tipo de equipamento.",
-      "Forecast": "Projeções e acompanhamento de Obras ( Receita e Volume)",
+      "Forecast": "#Prioridade - Dwigth - Larinha",
       "DRE": "Demonstrativo de Resultados com visão gerencial.",
       "Omie": "Visão financeira/ERP: lançamentos e integrações.",
       "Reta Final": "Painel de foco: status, checklist e execução.",
