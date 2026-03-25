@@ -33,7 +33,7 @@
       },
       {
         nome: "Auditoria Fretes",
-        iframe: `<iframe title="Auditoria - Fretes" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZWViODNkNmQtNTBiZC00YTFlLWE0NTYtNjkzOWU1M2IzMWFlIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
+        iframe: `<iframe title="Acsa - Dashboard" width="1140" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=bc95094e-98e8-474c-aa55-b07db5dba498&autoAuth=true&ctid=b7567895-10cc-49be-9241-37e572266fef" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
         nome: "Auditoria Modal",
