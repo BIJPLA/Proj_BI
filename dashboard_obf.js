@@ -26,6 +26,10 @@
   // ======== Tabela fixa de dashboards ========
 
   const permissoesBase = {
+    
+  "Tranparência": [
+      { nome: "Motoristas", '<iframe title="Motoristas" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZGRhODRkMjYtMWZmNi00ZThkLTgwNGEtMGU0NzA2YmY3NmIzIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'},
+  ],
     "Finanças": [
       {
         nome: "Dashboard Medição",
@@ -196,6 +200,7 @@
 
 function getIcon(dep) {
   const map = {
+   "Tranparência":`<span class="material-symbols-outlined">handshake</span>`,
     "Finanças": `<span class="material-symbols-outlined">payments</span>`,
     "Comercial": `<span class="material-symbols-outlined">trending_up</span>`,
     "Marketing": `<span class="material-symbols-outlined">campaign</span>`,
@@ -215,6 +220,7 @@ function getIcon(dep) {
 
   function getDashDesc(nome){
     const map = {
+      "Tranparência": "Lista de motoritas e Registros no Admin",
       "Dashboard Medição": "Acompanhamenoto de Medições pelo time de operações ",
       "Auditoria Fretes": "Revisão das viagens de fretes realizdas.",
       "Auditoria Modal": "Validações e visão por modal / tipo de equipamento.",
@@ -263,7 +269,9 @@ function getIcon(dep) {
         fonte[dep].forEach(d => {
           const b = document.createElement("a");
           b.className = "dashboard-card";
-          const iconAndTitle = (function(){if(d.nome=="Dashboard Medição") return `<span class="material-symbols-outlined">square_foot</span> Dashboard Medição `;
+          const iconAndTitle = (function(){
+            if(d.nome=="Motorista") return `<span class="material-symbols-outlined">digital_out_of_home</span> Motorista `;
+            if(d.nome=="Dashboard Medição") return `<span class="material-symbols-outlined">square_foot</span> Dashboard Medição `;
             if(d.nome=="Auditoria Fretes") return `<span class="material-symbols-outlined">fact_check</span> Auditoria Fretes `;
             if(d.nome=="Auditoria Modal") return `<span class="material-symbols-outlined">alt_route</span> Auditoria Modal`;
             if(d.nome=="Forecast") return `<span class="material-symbols-outlined">trending_up</span> Forecast`;
