@@ -110,10 +110,10 @@
 
     ],
 
-    "Reta Final": [
+    "Transparência": [
             {
-        nome: "Reta Final",
-        iframe: `<iframe title="Reta Final - 2025" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMmU1MDRlODUtYmQxMi00Y2NhLTgzZTQtMmEyOTI3N2VlZTAyIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
+        nome: "Motoristas",
+        iframe: `<iframe title="Motoristas" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZGRhODRkMjYtMWZmNi00ZThkLTgwNGEtMGU0NzA2YmY3NmIzIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       }
     ]
   };
@@ -204,7 +204,7 @@ function getIcon(dep) {
     "CS": `<span class="material-symbols-outlined">handshake</span>`,
     "People": `<span class="material-symbols-outlined">article_person</span>`,
     "Tech": `<span class="material-symbols-outlined">developer_mode_tv</span>`,
-    "Reta Final": `<span class="material-symbols-outlined">handshake</span>`
+    "Transparência": `<span class="material-symbols-outlined">handshake</span>`
   };
   return map[dep] || "";
 }
@@ -221,7 +221,7 @@ function getIcon(dep) {
       "Forecast": "Acomapnahmento de Custos e Receita - Previsto",
       "DRE": "Demonstrativo de Resultados com visão gerencial.",
       "Omie": "Visão financeira/ERP: lançamentos e integrações.",
-      "Reta Final": "Painel de foco: status, checklist e execução.",
+      "Motoristas": "Painel de foco: status, checklist e execução.",
       "Dashboard - Fretes": "KPIs de fretes, produtividade, custos e margem.",
       "Key Accont": "Visão por conta-chave: desempenho e oportunidades.",
       "CSI 2.0": "Indicadores de satisfação e qualidade de atendimento.",
@@ -269,7 +269,7 @@ function getIcon(dep) {
             if(d.nome=="Forecast") return `<span class="material-symbols-outlined">trending_up</span> Forecast`;
             if(d.nome=="DRE") return `<span class="material-symbols-outlined">dashboard</span> DRE`;
             if(d.nome=="Omie") return `<span class="material-symbols-outlined">square_foot</span> Omie`;
-            if(d.nome=="Reta Final") return `<span class="material-symbols-outlined">star</span> Reta Final`;
+            if(d.nome=="Motoristas") return `<span class="material-symbols-outlined">star</span> Motoristas`;
             if(d.nome=="Dashboard - Fretes") return `<span class="material-symbols-outlined">local_shipping</span> Dashboard - Fretes`;
             if(d.nome=="Key Accont") return `<span class="material-symbols-outlined">crown</span> Key Accont`;
             if(d.nome=="CSI 2.0") return `<span class="material-symbols-outlined">feature_search</span> CSI 2.0`;
