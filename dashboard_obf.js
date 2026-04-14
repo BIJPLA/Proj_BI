@@ -33,7 +33,7 @@
       },
       {
         nome: "Auditoria Fretes",
-        iframe: `<iframe title="Acsa - Dashboard" width="1140" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=bc95094e-98e8-474c-aa55-b07db5dba498&autoAuth=true&ctid=b7567895-10cc-49be-9241-37e572266fef" frameborder="0" allowFullScreen="true"></iframe>`
+        iframe: `<iframe title="Auditoria - Fretes" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZWViODNkNmQtNTBiZC00YTFlLWE0NTYtNjkzOWU1M2IzMWFlIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
         nome: "Auditoria Modal",
@@ -54,7 +54,7 @@
       { nome: "Gerencial", iframe: '<iframe title="Dash_Gerencial_2.0" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZTMzZTdlOGUtY2UxOC00MTY0LTgzNDItNzRhODNmZmMyOTZlIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'},
     { nome: "Key Accont", iframe: '<iframe title="Dash_Keyaccount" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYzk0MWNhZDctZjQ4Yi00MGQ3LTk2NzItZmY5MmFhZDI0YjE0IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>' },
     { nome: "CSI 2.0", iframe: '<iframe title="CSI - 2.0" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZjViMWYwODgtYzNjZC00NWI2LWEwNjgtYTlkMzRiMDA4N2E4IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>' },
-      { nome: "Calculadora", tipo: "APP", iframe: `<iframe title="Calculadora - LandApp" src="apps/Land_Calc_Embed/index.html" frameborder="0" allowFullScreen="true" loading="lazy"></iframe>` },
+      { nome: "Calculadora", tipo: "APP", iframe: `<iframe title="Calculadora - LandApp" src="apps/Land_Calc_Embed/index.html?v=${Date.now()}" frameborder="0" allowFullScreen="true" loading="lazy"></iframe>` },
       { nome: "Land Map", tipo: "APP", iframe: `<iframe title="Land Map - LandApp" src="Mapa_Obras_Projeto/index.html" frameborder="0" allowFullScreen="true" loading="lazy"></iframe>` },
 ],
     "People": [
@@ -218,7 +218,7 @@ function getIcon(dep) {
       "Dashboard Medição": "Acompanhamenoto de Medições pelo time de operações ",
       "Auditoria Fretes": "Revisão das viagens de fretes realizdas.",
       "Auditoria Modal": "Validações e visão por modal / tipo de equipamento.",
-      "Forecast": "Acomapnahmento de Custos e Receita - Previsto",
+      "Forecast": "Projeções e acompanhamento de Obras ( Receita e Volume)",
       "DRE": "Demonstrativo de Resultados com visão gerencial.",
       "Omie": "Visão financeira/ERP: lançamentos e integrações.",
       "Motoristas": "Painel de foco: status, checklist e execução.",

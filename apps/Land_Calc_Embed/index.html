@@ -111,7 +111,8 @@
       tabDetalhada.classList.toggle('active', !isSimples);
       tabSimples.setAttribute('aria-selected', String(isSimples));
       tabDetalhada.setAttribute('aria-selected', String(!isSimples));
-      frame.src = isSimples ? 'Consulta_Simples/index.html' : 'Consulta_Detalhada/index.html';
+      const version = `v=${Date.now()}`;
+      frame.src = isSimples ? `Consulta_Simples/index.html?${version}` : `Consulta_Detalhada/index.html?${version}`;
     }
 
     tabSimples.addEventListener('click', () => setActive('simples'));
