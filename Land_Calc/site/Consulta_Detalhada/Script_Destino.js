@@ -34,6 +34,7 @@ const DMT = {
   "JS dos Santos": { "Norte": 1.2, "Oeste": 1.2, "Leste": 1.2, "Sul": 1.2 },
   "Geoincorp": { "Norte": 1.25, "Oeste": 1.2, "Leste": 1.25, "Sul": 1.2 },
   "Sanca":{"Norte": 1.25, "Oeste":1.25, "Leste":1.25, "Sul": 1.30},
+"Maria Amélia":{"Norte": 1.30, "Oeste":1.30, "Leste":1.30, "Sul": 1.30},
   "Parmv":{"Norte": 1.25, "Oeste":1.25, "Leste":1.25, "Sul": 1.30},
 
 };
@@ -77,7 +78,8 @@ async function calcularRotas() {
   { nome: "HSH", coordenadas: [-46.399498, -23.481151], preco: 0, status: "Ativo"  },
   { nome: "JS dos Santos", coordenadas: [-46.770521, -23.438445], preco: 0, status: "Ativo"  },
   { nome: "Geoincorp", coordenadas: [-46.931481, -23.617269], preco: 0, status: "Ativo"  },
-  {nome: "Sanca", coordenadas: [-46.59873, -23.52481], preco: 0, status: "Ativo"}
+  {nome: "Sanca", coordenadas: [-46.59873, -23.52481], preco: 0, status: "Ativo"},
+      {nome: "Maria Amélia", coordenadas: [-46.435534, -23.380559], preco: 0, status: "Ativo"}
 ];
 
 
