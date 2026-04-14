@@ -79,7 +79,7 @@ async function calcularRotas() {
   { nome: "JS dos Santos", coordenadas: [-46.770521, -23.438445], preco: 0, status: "Ativo"  },
   { nome: "Geoincorp", coordenadas: [-46.931481, -23.617269], preco: 0, status: "Ativo"  },
   {nome: "Sanca", coordenadas: [-46.59873, -23.52481], preco: 0, status: "Ativo"},
-      {nome: "Maria Amélia", coordenadas: [-46.435534, -23.380559], preco: 0, status: "Ativo"}
+      {nome: "Maria Amélia", coordenadas: [-46.435534, -23.380559], preco: 0, status: "Ativo"},
 ];
 
 
