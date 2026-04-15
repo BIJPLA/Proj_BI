@@ -317,3 +317,45 @@ gap:10px;
   border-width:0;
   margin-top:0;
 }
+
+
+.row-date-range{grid-template-columns: 1fr 1fr;}
+
+.map-container{position:relative;}
+.map-pin-legend{
+  position:absolute;
+  left:16px;
+  bottom:16px;
+  z-index:500;
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(11,13,18,.48);
+  backdrop-filter:blur(6px);
+  color:var(--text);
+  font-size:12px;
+  line-height:1.35;
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+}
+.map-pin-legend-title{
+  font-weight:800;
+  margin-bottom:6px;
+}
+.map-pin-legend-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.map-pin-legend-item + .map-pin-legend-item{ margin-top:4px; }
+.legend-pin{
+  width:11px;
+  height:11px;
+  border-radius:999px;
+  display:inline-block;
+  border:1px solid rgba(255,255,255,.58);
+  box-shadow:0 0 0 2px rgba(255,255,255,.08);
+}
+.legend-cut{ background:#ffb020; }
+.legend-truck{ background:#4cc9f0; }
+.legend-rubble{ background:#2ee59d; }
+.legend-focus{ background:#7c5cff; }

@@ -113,7 +113,7 @@
     "Transparência": [
             {
         nome: "Motoristas",
-        iframe: `<iframe title="Motoristas" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZGRhODRkMjYtMWZmNi00ZThkLTgwNGEtMGU0NzA2YmY3NmIzIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
+        iframe: `<iframe title="Reta Final - 2025" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMmU1MDRlODUtYmQxMi00Y2NhLTgzZTQtMmEyOTI3N2VlZTAyIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       }
     ]
   };
@@ -269,7 +269,7 @@ function getIcon(dep) {
             if(d.nome=="Forecast") return `<span class="material-symbols-outlined">trending_up</span> Forecast`;
             if(d.nome=="DRE") return `<span class="material-symbols-outlined">dashboard</span> DRE`;
             if(d.nome=="Omie") return `<span class="material-symbols-outlined">square_foot</span> Omie`;
-            if(d.nome=="Motoristas") return `<span class="material-symbols-outlined">star</span> Motoristas`;
+            if(d.nome=="Motoristas") return `<span class="material-symbols-outlined">star</span> Reta Final`;
             if(d.nome=="Dashboard - Fretes") return `<span class="material-symbols-outlined">local_shipping</span> Dashboard - Fretes`;
             if(d.nome=="Key Accont") return `<span class="material-symbols-outlined">crown</span> Key Accont`;
             if(d.nome=="CSI 2.0") return `<span class="material-symbols-outlined">feature_search</span> CSI 2.0`;

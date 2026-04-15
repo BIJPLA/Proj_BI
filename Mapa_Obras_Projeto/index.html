@@ -147,6 +147,17 @@
         <label>Bairro</label>
         <input id="fBairro" placeholder="Ex: Indianópolis" />
 
+        <div class="row row-date-range">
+          <div>
+            <label>Última data da rota — início</label>
+            <input id="fDataInicio" type="date" />
+          </div>
+          <div>
+            <label>Última data da rota — fim</label>
+            <input id="fDataFim" type="date" />
+          </div>
+        </div>
+
         <div class="row">
           <div>
             <button id="btnAplicarFiltros">Aplicar filtros</button>
@@ -173,6 +184,13 @@
 
         <main class="map-container">
       <div id="map"></div>
+      <div class="map-pin-legend" aria-label="Legenda das cores dos pins">
+        <div class="map-pin-legend-title">Legenda dos pins</div>
+        <div class="map-pin-legend-item"><span class="legend-pin legend-cut"></span><span>Corte</span></div>
+        <div class="map-pin-legend-item"><span class="legend-pin legend-truck"></span><span>Caminhão</span></div>
+        <div class="map-pin-legend-item"><span class="legend-pin legend-rubble"></span><span>Entulho</span></div>
+        <div class="map-pin-legend-item"><span class="legend-pin legend-focus"></span><span>Novo endereço</span></div>
+      </div>
     </main>
   </div>
 

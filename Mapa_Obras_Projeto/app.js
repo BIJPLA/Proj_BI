@@ -67,6 +67,39 @@ function distanciaKm(lat1,lng1,lat2,lng2){
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
+
+function parseDateOnlyLocal(dateStr){
+  if (!dateStr) return null;
+  const [y,m,d] = String(dateStr).split("-").map(Number);
+  if (!y || !m || !d) return null;
+  return new Date(y, m-1, d, 0, 0, 0, 0);
+}
+
+function parseDbDate(value){
+  if (!value) return null;
+  const s = String(value).trim();
+  if (!s) return null;
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+  if (m){
+    const [,yy,mm,dd,hh='0',mi='0',ss='0'] = m;
+    return new Date(Number(yy), Number(mm)-1, Number(dd), Number(hh), Number(mi), Number(ss), 0);
+  }
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function fmtDateBR(d){
+  if (!d) return "—";
+  try{
+    return new Intl.DateTimeFormat("pt-BR", {
+      year: "numeric", month: "2-digit", day: "2-digit"
+    }).format(d);
+  }catch{
+    const pad = (n)=> String(n).padStart(2,"0");
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+  }
+}
+
 /** ========= mapa ========= */
 const DEFAULT_VIEW = { center: [-23.55052, -46.633308], zoom: 12 };
 const map = L.map("map", { zoomControl:true }).setView(DEFAULT_VIEW.center, DEFAULT_VIEW.zoom);
@@ -106,7 +139,9 @@ const state = {
     destino: "",
     tipo: "",
     regiao: "",
-    bairro: ""
+    bairro: "",
+    dataInicio: "",
+    dataFim: ""
   },
   foco: { lat:null, lng:null, raioKm:null, enderecoTxt:"" },
   obras: [] // { ...obra, marker }
@@ -138,7 +173,9 @@ function buildPopup(obra){
   const lat = obra.lat?.toFixed?.(6) ?? obra.lat;
   const lng = obra.lng?.toFixed?.(6) ?? obra.lng;
 
-  const dtStr = ULTIMA_DATA_BASE ? fmtDateTimeBR(new Date(ULTIMA_DATA_BASE)) : "";
+  const dtBase = ULTIMA_DATA_BASE ? parseDbDate(ULTIMA_DATA_BASE) : null;
+  const dtStr = dtBase ? fmtDateTimeBR(dtBase) : "";
+  const dtUltimaRota = parseDbDate(obra.ultima_data_rota);
 const header = `
     <div style="min-width:280px">
       <div style="font-weight:900;font-size:14px;margin-bottom:6px">${escapeHtml(obra.obra_nome)}</div>
@@ -151,8 +188,9 @@ const header = `
         <div><b>Tipo:</b> ${escapeHtml(volumeLabel2(obra.volume_type_raw))}</div>
         <div><b>Cidade:</b> ${escapeHtml(obra.city ?? "—")}</div>
         <div><b>Bairro:</b> ${escapeHtml(obra.neighborhood ?? "—")}</div>
-        ${dtStr ? `<div><b>Data:</b> ${escapeHtml(dtStr)}</div>` : ""}
+        ${dtUltimaRota ? `<div><b>Última rota:</b> ${escapeHtml(fmtDateBR(dtUltimaRota))}</div>` : ""}
         <div><b>Região:</b> ${escapeHtml(obra.region ?? "—")}</div>
+        ${dtStr ? `<div><b>Base até:</b> ${escapeHtml(dtStr)}</div>` : ""}
       </div>
   `;
 
@@ -167,6 +205,7 @@ const header = `
       <td style="padding:6px 8px;border-top:1px solid rgba(0,0,0,.08)">${escapeHtml(fmtBRL(r.preco_cliente))}</td>
       <td style="padding:6px 8px;border-top:1px solid rgba(0,0,0,.08)">${escapeHtml(fmtBRL(r.preco_motorista))}</td>
       <td style="padding:6px 8px;border-top:1px solid rgba(0,0,0,.08)">${escapeHtml(fmtBRL(r.preco_destino))}</td>
+      <td style="padding:6px 8px;border-top:1px solid rgba(0,0,0,.08)">${escapeHtml(fmtDateBR(parseDbDate(r.ultima_data_rota)))}</td>
     </tr>
   `).join("");
 
@@ -183,9 +222,10 @@ const header = `
             <th style="text-align:left;padding:8px;border-bottom:1px solid rgba(0,0,0,.08)">Preço Cliente</th>
             <th style="text-align:left;padding:8px;border-bottom:1px solid rgba(0,0,0,.08)">Preço Motorista</th>
             <th style="text-align:left;padding:8px;border-bottom:1px solid rgba(0,0,0,.08)">Preço Destino</th>
+            <th style="text-align:left;padding:8px;border-bottom:1px solid rgba(0,0,0,.08)">Última data</th>
           </tr>
         </thead>
-        <tbody>${rows || `<tr><td colspan="5" style="padding:10px;color:#556">Sem rotas nessa obra.</td></tr>`}</tbody>
+        <tbody>${rows || `<tr><td colspan="6" style="padding:10px;color:#556">Sem rotas nessa obra.</td></tr>`}</tbody>
       </table>
     </div>
     ${more}
@@ -203,6 +243,8 @@ function readFilters(){
   state.filtro.tipo    = (document.getElementById("fTipo").value ?? "").trim().toUpperCase();
   state.filtro.regiao  = (document.getElementById("fRegiao").value ?? "").trim().toUpperCase();
   state.filtro.bairro  = norm(document.getElementById("fBairro").value);
+  state.filtro.dataInicio = (document.getElementById("fDataInicio").value ?? "").trim();
+  state.filtro.dataFim = (document.getElementById("fDataFim").value ?? "").trim();
 
   const active = [];
   if (state.filtro.cliente) active.push("Cliente");
@@ -211,6 +253,7 @@ function readFilters(){
   if (state.filtro.tipo) active.push("Tipo");
   if (state.filtro.regiao) active.push("Região");
   if (state.filtro.bairro) active.push("Bairro");
+  if (state.filtro.dataInicio || state.filtro.dataFim) active.push("Data");
   elFiltroPill.textContent = active.length ? `${active.length} filtro(s)` : "Sem filtros";
 }
 
@@ -235,6 +278,19 @@ function matchesFilters(obra){
     const rotas = Array.isArray(obra.rotas) ? obra.rotas : [];
     const ok = rotas.some(r => norm(r.destino_nome).includes(f.destino));
     if (!ok) return false;
+  }
+
+  const dtUltima = parseDbDate(obra.ultima_data_rota);
+  const dtInicio = parseDateOnlyLocal(f.dataInicio);
+  const dtFim = parseDateOnlyLocal(f.dataFim);
+
+  if (dtInicio){
+    if (!dtUltima || dtUltima < dtInicio) return false;
+  }
+  if (dtFim){
+    const fimDia = new Date(dtFim);
+    fimDia.setHours(23,59,59,999);
+    if (!dtUltima || dtUltima > fimDia) return false;
   }
 
   return true;
@@ -288,6 +344,7 @@ function updateMarkersAndList(){
       <div class="m">
         <span class="tag">cliente: <b>${escapeHtml(o.cliente ?? "—")}</b></span>
         <span class="tag">tipo: <b>${escapeHtml(volumeLabel2(o.volume_type_raw))}</b></span>
+        <span class="tag">última rota: <b>${escapeHtml(fmtDateBR(parseDbDate(o.ultima_data_rota)))}</b></span>
         ${dist==null ? `<span class="tag">distância: —</span>` : `<span class="tag ok">distância: ${dist.toFixed(2)} km</span>`}
       </div>
     `;
@@ -440,7 +497,7 @@ function init(){
 
   readFilters();
   updateMarkersAndList();
-  setStatus("Pronto. Filtros e cores por tipo já estão valendo 😼");
+  setStatus("Pronto. Filtros, data da última rota e cores por tipo já estão valendo 😼");
 }
 
 document.getElementById("btnFiltrar").addEventListener("click", aplicarFoco);
@@ -465,6 +522,8 @@ function limparFiltros({ silentStatus = false } = {}){
   document.getElementById("fTipo").value = "";
   document.getElementById("fRegiao").value = "";
   document.getElementById("fBairro").value = "";
+  document.getElementById("fDataInicio").value = "";
+  document.getElementById("fDataFim").value = "";
   readFilters();
   updateMarkersAndList();
   if (!silentStatus) setStatus("Filtros limpos ✅");
@@ -472,7 +531,7 @@ function limparFiltros({ silentStatus = false } = {}){
 document.getElementById("btnLimparFiltros").addEventListener("click", () => limparFiltros());
 
 // bônus: aplicar filtros apertando Enter em qualquer input
-["fCliente","fObra","fDestino","fBairro"].forEach(id => {
+["fCliente","fObra","fDestino","fBairro","fDataInicio","fDataFim"].forEach(id => {
   document.getElementById(id).addEventListener("keydown", (e) => {
     if (e.key === "Enter"){ readFilters(); updateMarkersAndList(); }
   });
