@@ -269,7 +269,7 @@ function getIcon(dep) {
             if(d.nome=="Forecast") return `<span class="material-symbols-outlined">trending_up</span> Forecast`;
             if(d.nome=="DRE") return `<span class="material-symbols-outlined">dashboard</span> DRE`;
             if(d.nome=="Omie") return `<span class="material-symbols-outlined">square_foot</span> Omie`;
-            if(d.nome=="Motoristas") return `<span class="material-symbols-outlined">star</span> Reta Final`;
+            if(d.nome=="Motoristas") return `<span class="material-symbols-outlined">star</span> Motoristas`;
             if(d.nome=="Dashboard - Fretes") return `<span class="material-symbols-outlined">local_shipping</span> Dashboard - Fretes`;
             if(d.nome=="Key Accont") return `<span class="material-symbols-outlined">crown</span> Key Accont`;
             if(d.nome=="CSI 2.0") return `<span class="material-symbols-outlined">feature_search</span> CSI 2.0`;
