@@ -48,10 +48,11 @@ function toolOpen(id) {
   closeAllPanels();
 
   setTimeout(() => {
-    // Carregar iframe na primeira vez
+    // Carregar iframe — usa data-loaded para evitar falso positivo do src=""
     const iframe = document.getElementById(iframeId);
-    if (iframe && !iframe.src) {
+    if (iframe && !iframe.dataset.loaded) {
       iframe.src = _toolSrcs[id] || '';
+      iframe.dataset.loaded = '1';
     }
 
     const sw = sidebar ? sidebar.offsetWidth : 280;
