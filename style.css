@@ -537,3 +537,377 @@ iframe{
 
 /* Quando a sidebar recolhe, esconde o Alfred pra não esmagar tudo */
 .sidebar.is-collapsed .alfred-sidebar{ display:none; }
+
+/* =====================================================
+   Alfred Chat — Botão na Sidebar
+   ===================================================== */
+
+.alfred-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(77,163,255,.30);
+  background: linear-gradient(135deg, rgba(77,163,255,.12), rgba(77,163,255,.06));
+  color: rgba(255,255,255,.92);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  letter-spacing: .2px;
+  transition: background .18s ease, border .18s ease, transform .15s ease, box-shadow .15s ease;
+  position: relative;
+  overflow: hidden;
+}
+.alfred-nav-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(77,163,255,.10), transparent);
+  opacity: 0;
+  transition: opacity .18s ease;
+}
+.alfred-nav-btn:hover {
+  background: linear-gradient(135deg, rgba(77,163,255,.22), rgba(77,163,255,.10));
+  border-color: rgba(77,163,255,.55);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(77,163,255,.20);
+}
+.alfred-nav-btn:hover::before { opacity: 1; }
+.alfred-nav-btn:active { transform: translateY(0); }
+
+.alfred-nav-icon { font-size: 18px; line-height: 1; flex: 0 0 auto; }
+.alfred-nav-text { flex: 1; text-align: left; }
+.alfred-nav-badge {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  background: rgba(77,163,255,.25);
+  color: #4da3ff;
+  border: 1px solid rgba(77,163,255,.30);
+  border-radius: 999px;
+  padding: 2px 7px;
+  flex: 0 0 auto;
+}
+
+/* Esconder texto quando sidebar recolhida */
+.sidebar.is-collapsed .alfred-nav-btn { justify-content: center; padding: 12px 10px; gap: 0; }
+.sidebar.is-collapsed .alfred-nav-text,
+.sidebar.is-collapsed .alfred-nav-badge { display: none; }
+.sidebar.is-collapsed .alfred-nav-icon { font-size: 22px; }
+
+/* =====================================================
+   Alfred Chat — Painel (estilo ChatGPT / LandApp)
+   ===================================================== */
+
+.alfred-chat-panel {
+  position: fixed;
+  top: 0;
+  left: 280px;   /* ajustado via JS quando sidebar recolhe */
+  right: 0;
+  bottom: 0;
+  background: #0b1220;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .28s ease, transform .28s ease;
+  overflow: hidden;
+}
+.alfred-chat-panel.acp-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Header ── */
+.acp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: rgba(15,26,46,.95);
+  backdrop-filter: blur(10px);
+  flex: 0 0 auto;
+}
+.acp-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.acp-logo {
+  height: 32px;
+  width: auto;
+  opacity: .92;
+}
+.acp-header-info { display: flex; flex-direction: column; gap: 2px; }
+.acp-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: rgba(255,255,255,.95);
+  letter-spacing: .2px;
+}
+.acp-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: rgba(255,255,255,.55);
+}
+.acp-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #40d27f;
+  box-shadow: 0 0 6px #40d27f;
+  animation: acp-pulse 2s infinite;
+}
+@keyframes acp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+.acp-header-right { display: flex; align-items: center; gap: 8px; }
+.acp-btn-clear,
+.acp-btn-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+  color: rgba(255,255,255,.70);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .16s ease, color .16s ease;
+}
+.acp-btn-clear:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.92); }
+.acp-btn-close:hover { background: rgba(255,100,100,.12); color: #ff9b9b; }
+
+/* ── Área de mensagens ── */
+.acp-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  scroll-behavior: smooth;
+}
+.acp-messages::-webkit-scrollbar { width: 6px; }
+.acp-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,.10); border-radius: 999px; }
+
+/* ── Tela de boas-vindas ── */
+.acp-welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+  padding: 48px 32px;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+.acp-welcome-icon { font-size: 54px; line-height: 1; }
+.acp-welcome-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: rgba(255,255,255,.95);
+}
+.acp-welcome-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,.55);
+  line-height: 1.6;
+  max-width: 420px;
+}
+.acp-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+}
+.acp-suggestion {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  color: rgba(255,255,255,.75);
+  font-size: 12.5px;
+  cursor: pointer;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  transition: background .16s ease, border .16s ease, color .16s ease;
+}
+.acp-suggestion:hover {
+  background: rgba(77,163,255,.12);
+  border-color: rgba(77,163,255,.35);
+  color: rgba(255,255,255,.92);
+}
+
+/* ── Mensagens ── */
+.acp-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 24px;
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+.acp-msg-user {
+  justify-content: flex-end;
+}
+.acp-msg-alfred {
+  justify-content: flex-start;
+}
+
+.acp-avatar {
+  font-size: 24px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(77,163,255,.12);
+  border: 1px solid rgba(77,163,255,.20);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  line-height: 1;
+}
+
+.acp-bubble-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: calc(100% - 52px);
+}
+
+.acp-bubble {
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.acp-msg-user .acp-bubble {
+  background: linear-gradient(135deg, #1e3a5f, #1a3555);
+  border: 1px solid rgba(77,163,255,.25);
+  color: rgba(255,255,255,.92);
+  border-bottom-right-radius: 4px;
+}
+.acp-msg-alfred .acp-bubble {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.10);
+  color: rgba(255,255,255,.90);
+  border-bottom-left-radius: 4px;
+}
+
+.acp-msg-time {
+  font-size: 10px;
+  color: rgba(255,255,255,.35);
+  padding: 0 4px;
+}
+.acp-msg-user .acp-msg-time { text-align: right; }
+
+/* ── Typing indicator ── */
+.acp-typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 14px 18px !important;
+  min-width: 56px;
+}
+.acp-typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.50);
+  animation: acp-bounce .9s infinite ease-in-out;
+}
+.acp-typing span:nth-child(2) { animation-delay: .15s; }
+.acp-typing span:nth-child(3) { animation-delay: .30s; }
+@keyframes acp-bounce {
+  0%, 80%, 100% { transform: scale(0.7); opacity: .5; }
+  40%           { transform: scale(1.1); opacity: 1; }
+}
+
+/* ── Input ── */
+.acp-input-area {
+  padding: 16px 24px 20px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  background: rgba(15,26,46,.95);
+  backdrop-filter: blur(10px);
+  flex: 0 0 auto;
+}
+.acp-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  padding: 10px 14px;
+  transition: border .18s ease;
+  max-width: 860px;
+  margin: 0 auto;
+}
+.acp-input-row:focus-within {
+  border-color: rgba(77,163,255,.40);
+  box-shadow: 0 0 0 3px rgba(77,163,255,.08);
+}
+.acp-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: rgba(255,255,255,.92);
+  font-size: 14px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  resize: none;
+  line-height: 1.55;
+  min-height: 22px;
+  max-height: 160px;
+  overflow-y: auto;
+  padding: 0;
+}
+.acp-input::placeholder { color: rgba(255,255,255,.38); }
+.acp-send-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: #4da3ff;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  transition: background .16s ease, transform .15s ease;
+}
+.acp-send-btn:hover { background: #3b8fe6; transform: scale(1.05); }
+.acp-send-btn:disabled { background: rgba(255,255,255,.12); cursor: not-allowed; transform: none; }
+.acp-send-btn .material-symbols-outlined { font-size: 18px; }
+
+.acp-footer-hint {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255,255,255,.28);
+  margin-top: 10px;
+  max-width: 860px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsivo */
+@media (max-width: 860px) {
+  .alfred-chat-panel { left: 84px !important; }
+}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           

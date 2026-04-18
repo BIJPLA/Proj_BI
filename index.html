@@ -120,20 +120,77 @@
         </div>
       </div>
 
+      <!-- Botão Alfred -->
+      <button class="alfred-nav-btn" id="alfredOpenBtn" onclick="alfredChatOpen()">
+        <span class="alfred-nav-icon">🕵🏼</span>
+        <span class="alfred-nav-text">Alfred</span>
+        <span class="alfred-nav-badge">IA</span>
+      </button>
+
       <div class="sidebar-section">
         <div class="sidebar-label">Setores</div>
         <div id="departamentos"></div>
       </div>
 
-      <div class="sidebar-section alfred-sidebar">
-        <div class="sidebar-label">Alfred 🕵🏼</div>
-        <div id="alfredSidebarMount"></div>
-      </div>
+      <!-- mount legado (oculto) -->
+      <div id="alfredSidebarMount" style="display:none"></div>
     </aside>
 
     <main class="main-content" id="mainContent">
       <div id="dashboards"></div>
     </main>
+  </div>
+
+  <!-- Alfred Chat Panel -->
+  <div id="alfredChatPanel" class="alfred-chat-panel" style="display:none" aria-label="Alfred Chat">
+    <div class="acp-header">
+      <div class="acp-header-left">
+        <img src="Imagens/Logo_Plataforma_Branco.png" alt="LandApp" class="acp-logo"/>
+        <div class="acp-header-info">
+          <span class="acp-name">Alfred</span>
+          <span class="acp-status"><span class="acp-dot"></span>Online</span>
+        </div>
+      </div>
+      <div class="acp-header-right">
+        <button class="acp-btn-clear" onclick="alfredChatClear()" title="Nova conversa">
+          <span class="material-symbols-outlined">edit_square</span>
+        </button>
+        <button class="acp-btn-close" onclick="alfredChatClose()" title="Fechar">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="acp-messages" id="alfredMessages">
+      <div class="acp-welcome">
+        <div class="acp-welcome-icon">🕵🏼</div>
+        <div class="acp-welcome-title">Olá! Eu sou o Alfred.</div>
+        <div class="acp-welcome-sub">Posso responder perguntas sobre viagens, fretes, obras, motoristas e veículos da LandApp. Me pergunte qualquer coisa!</div>
+        <div class="acp-suggestions">
+          <button class="acp-suggestion" onclick="alfredSuggest(this)">Qual o destino mais atendido este mês?</button>
+          <button class="acp-suggestion" onclick="alfredSuggest(this)">Quantas viagens foram finalizadas hoje?</button>
+          <button class="acp-suggestion" onclick="alfredSuggest(this)">Quais os 5 clientes com mais fretes?</button>
+          <button class="acp-suggestion" onclick="alfredSuggest(this)">Qual motorista fez mais viagens?</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="acp-input-area">
+      <div class="acp-input-row">
+        <textarea
+          id="alfredInput"
+          class="acp-input"
+          placeholder="Pergunte sobre dados da LandApp..."
+          rows="1"
+          onkeydown="alfredInputKey(event)"
+          oninput="alfredInputResize(this)"
+        ></textarea>
+        <button class="acp-send-btn" id="alfredSendBtn" onclick="alfredChatSend()">
+          <span class="material-symbols-outlined">arrow_upward</span>
+        </button>
+      </div>
+      <div class="acp-footer-hint">Alfred consulta o banco em tempo real · As respostas são geradas por IA</div>
+    </div>
   </div>
 
   <script src="colaboradores.js"></script>
