@@ -1,0 +1,11 @@
+{
+  "name": "plataforma-360-api",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "mysql2": "^3.11.0"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}
