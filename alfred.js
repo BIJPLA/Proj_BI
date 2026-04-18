@@ -11,22 +11,85 @@ const _alfredState = {
   open: false
 };
 
+// ─── Gerenciador de painéis (Alfred + Ferramentas) ───────────────────────────
+function closeAllPanels() {
+  // Fechar Alfred
+  const alfredPanel = document.getElementById('alfredChatPanel');
+  if (alfredPanel && _alfredState.open) {
+    alfredPanel.classList.remove('acp-visible');
+    setTimeout(() => { alfredPanel.style.display = 'none'; }, 280);
+    _alfredState.open = false;
+  }
+  // Fechar ferramentas
+  ['landcalcPanel', 'landmapPanel'].forEach(id => {
+    const p = document.getElementById(id);
+    if (p && p.style.display !== 'none') {
+      p.classList.remove('acp-visible');
+      setTimeout(() => { p.style.display = 'none'; }, 280);
+    }
+  });
+}
+window.closeAllPanels = closeAllPanels;
+
+// ─── Abrir / fechar ferramentas (Calculadora e LandMap) ──────────────────────
+const _toolSrcs = {
+  landcalc: `apps/Land_Calc_Embed/index.html?v=${Date.now()}`,
+  landmap:  'Mapa_Obras_Projeto/index.html'
+};
+
+function toolOpen(id) {
+  const panelId = id + 'Panel';
+  const iframeId = id + 'Iframe';
+  const panel = document.getElementById(panelId);
+  const sidebar = document.querySelector('.sidebar');
+  if (!panel) return;
+
+  // Fechar outros painéis primeiro
+  closeAllPanels();
+
+  setTimeout(() => {
+    // Carregar iframe na primeira vez
+    const iframe = document.getElementById(iframeId);
+    if (iframe && !iframe.src) {
+      iframe.src = _toolSrcs[id] || '';
+    }
+
+    const sw = sidebar ? sidebar.offsetWidth : 280;
+    panel.style.left = sw + 'px';
+    panel.style.display = 'flex';
+
+    setTimeout(() => panel.classList.add('acp-visible'), 10);
+  }, 300);
+}
+window.toolOpen = toolOpen;
+
+function toolClose(id) {
+  const panel = document.getElementById(id + 'Panel');
+  if (!panel) return;
+  panel.classList.remove('acp-visible');
+  setTimeout(() => { panel.style.display = 'none'; }, 280);
+}
+window.toolClose = toolClose;
+
 // ─── Abrir / fechar chat ─────────────────────────────────────────────────────
 function alfredChatOpen() {
   const panel = document.getElementById('alfredChatPanel');
   const sidebar = document.querySelector('.sidebar');
   if (!panel) return;
-  panel.style.display = 'flex';
-  _alfredState.open = true;
 
-  // Ajusta margem do painel para acompanhar a sidebar
-  const sw = sidebar ? sidebar.offsetWidth : 280;
-  panel.style.left = sw + 'px';
+  // Fechar ferramentas abertas primeiro
+  closeAllPanels();
 
   setTimeout(() => {
-    panel.classList.add('acp-visible');
-    document.getElementById('alfredInput')?.focus();
-  }, 10);
+    panel.style.display = 'flex';
+    _alfredState.open = true;
+    const sw = sidebar ? sidebar.offsetWidth : 280;
+    panel.style.left = sw + 'px';
+    setTimeout(() => {
+      panel.classList.add('acp-visible');
+      document.getElementById('alfredInput')?.focus();
+    }, 10);
+  }, 300);
 }
 
 function alfredChatClose() {

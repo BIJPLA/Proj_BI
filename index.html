@@ -127,6 +127,18 @@
         <span class="alfred-nav-badge">IA</span>
       </button>
 
+      <!-- Botões de ferramentas (visíveis só para Comercial) -->
+      <div id="toolButtons" style="display:none; display:flex; flex-direction:column; gap:8px;">
+        <button class="tool-nav-btn tool-calc" id="landcalcBtn" onclick="toolOpen('landcalc')">
+          <span class="material-symbols-outlined tool-nav-icon">calculate</span>
+          <span class="tool-nav-text">Calculadora</span>
+        </button>
+        <button class="tool-nav-btn tool-map" id="landmapBtn" onclick="toolOpen('landmap')">
+          <span class="material-symbols-outlined tool-nav-icon">map</span>
+          <span class="tool-nav-text">Land Map</span>
+        </button>
+      </div>
+
       <div class="sidebar-section">
         <div class="sidebar-label">Setores</div>
         <div id="departamentos"></div>
@@ -139,6 +151,46 @@
     <main class="main-content" id="mainContent">
       <div id="dashboards"></div>
     </main>
+  </div>
+
+  <!-- LandCalc Panel -->
+  <div id="landcalcPanel" class="tool-panel" style="display:none" aria-label="Calculadora LandApp">
+    <div class="tool-panel-header">
+      <div class="tool-panel-header-left">
+        <img src="Imagens/Logo_Plataforma_Branco.png" alt="LandApp" class="acp-logo"/>
+        <div class="acp-header-info">
+          <span class="acp-name">Calculadora</span>
+          <span class="acp-status"><span class="material-symbols-outlined" style="font-size:13px;color:#40d27f">calculate</span> LandApp App</span>
+        </div>
+      </div>
+      <button class="acp-btn-close" onclick="toolClose('landcalc')" title="Fechar">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="tool-panel-body">
+      <iframe id="landcalcIframe" src="" title="Calculadora LandApp" frameborder="0" allowfullscreen loading="lazy"
+        style="width:100%;height:100%;border:none;border-radius:0;margin:0;min-height:unset;"></iframe>
+    </div>
+  </div>
+
+  <!-- LandMap Panel -->
+  <div id="landmapPanel" class="tool-panel" style="display:none" aria-label="Land Map LandApp">
+    <div class="tool-panel-header">
+      <div class="tool-panel-header-left">
+        <img src="Imagens/Logo_Plataforma_Branco.png" alt="LandApp" class="acp-logo"/>
+        <div class="acp-header-info">
+          <span class="acp-name">Land Map</span>
+          <span class="acp-status"><span class="material-symbols-outlined" style="font-size:13px;color:#40d27f">map</span> LandApp App</span>
+        </div>
+      </div>
+      <button class="acp-btn-close" onclick="toolClose('landmap')" title="Fechar">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="tool-panel-body">
+      <iframe id="landmapIframe" src="" title="Land Map LandApp" frameborder="0" allowfullscreen loading="lazy"
+        style="width:100%;height:100%;border:none;border-radius:0;margin:0;min-height:unset;"></iframe>
+    </div>
   </div>
 
   <!-- Alfred Chat Panel -->

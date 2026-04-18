@@ -54,8 +54,6 @@
       { nome: "Gerencial", iframe: '<iframe title="Dash_Gerencial_2.0" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZTMzZTdlOGUtY2UxOC00MTY0LTgzNDItNzRhODNmZmMyOTZlIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'},
     { nome: "Key Accont", iframe: '<iframe title="Dash_Keyaccount" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYzk0MWNhZDctZjQ4Yi00MGQ3LTk2NzItZmY5MmFhZDI0YjE0IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>' },
     { nome: "CSI 2.0", iframe: '<iframe title="CSI - 2.0" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZjViMWYwODgtYzNjZC00NWI2LWEwNjgtYTlkMzRiMDA4N2E4IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>' },
-      { nome: "Calculadora", tipo: "APP", iframe: `<iframe title="Calculadora - LandApp" src="apps/Land_Calc_Embed/index.html?v=${Date.now()}" frameborder="0" allowFullScreen="true" loading="lazy"></iframe>` },
-      { nome: "Land Map", tipo: "APP", iframe: `<iframe title="Land Map - LandApp" src="Mapa_Obras_Projeto/index.html" frameborder="0" allowFullScreen="true" loading="lazy"></iframe>` },
 ],
     "People": [
       { nome: "Swile", iframe: '<iframe title="Dashboard - People" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiMGQ2OGEwZjItMmIwNS00ODFmLTliNjEtNWM3N2I5YzM5M2VhIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>'},
@@ -249,6 +247,13 @@ function getIcon(dep) {
 
     const fonte = window.permissoesAtuais || {};
 
+    // Mostrar botões de ferramentas se tiver permissão Comercial
+    const toolBtns = document.getElementById('toolButtons');
+    if (toolBtns) {
+      const temComercial = Object.keys(fonte).some(d => _slugDepto(d) === 'comercial');
+      toolBtns.style.display = temComercial ? 'flex' : 'none';
+    }
+
     for (let dep in fonte) {
       if (!Object.prototype.hasOwnProperty.call(fonte, dep)) continue;
 
@@ -257,6 +262,9 @@ function getIcon(dep) {
       btn.innerHTML = `${getIcon(dep)} ${dep}`;
 
       btn.onclick = () => {
+        // Fechar todos os painéis ao clicar em setor
+        if (typeof window.closeAllPanels === 'function') window.closeAllPanels();
+
         dashArea.innerHTML = `<h3>${dep}</h3><div class="dash-grid" id="dashGrid"></div>`;
         const grid = dashArea.querySelector('#dashGrid');
 
