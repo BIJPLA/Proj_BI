@@ -479,32 +479,8 @@ function popularDestinos(){
 }
 
 
-async function init(){
+function init(){
   setStatus("Carregando obras…");
-
-  // ── Tentar banco em tempo real ──────────────────────────────────────────────
-  try {
-    const res  = await fetch("/api/mapa/obras", { signal: AbortSignal.timeout(15000) });
-    const data = await res.json();
-    if (!res.ok || !data.ok) throw new Error(data?.error || `HTTP ${res.status}`);
-    OBRAS             = Array.isArray(data.obras) ? data.obras : [];
-    ULTIMA_DATA_BASE  = data.ultima_data_base ?? null;
-    console.info(`[LandMap] ${OBRAS.length} obras carregadas do banco ✅`);
-  } catch (err) {
-    // ── Fallback: data.js local (sempre garante que o mapa funciona) ──────────
-    console.warn("[LandMap] API indisponível, usando data.js local:", err.message);
-    try {
-      const mod        = await import("./data.js");
-      OBRAS            = mod.OBRAS           ?? [];
-      ULTIMA_DATA_BASE = mod.ULTIMA_DATA_BASE ?? null;
-      setStatus(`Dados locais (API offline) — ${OBRAS.length} obras`);
-    } catch (e2) {
-      console.error("[LandMap] data.js também falhou:", e2);
-      setStatus("⚠️ Não foi possível carregar as obras.");
-      return;
-    }
-  }
-
   popularRegioes();
   popularClientes();
   popularObras();
@@ -521,7 +497,7 @@ async function init(){
 
   readFilters();
   updateMarkersAndList();
-  if (OBRAS.length) setStatus("Pronto. Filtros, data da última rota e cores por tipo já estão valendo 😼");
+  setStatus("Pronto. Filtros, data da última rota e cores por tipo já estão valendo 😼");
 }
 
 document.getElementById("btnFiltrar").addEventListener("click", aplicarFoco);

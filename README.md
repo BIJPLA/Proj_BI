@@ -89,4 +89,4 @@ Exemplos de perguntas:
 
 ## Observação importante
 
-Eu não consegui validar a conexão real daqui porque faltam as credenciais finais do banco (`DB_USER` e `DB_PASSWORD`) e a chave da IA (`JPPP`). A estrutura já está pronta — é literalmente preencher isso e ligar o motor 😎
+Eu não consegui validar a conexão real daqui porque faltam as credenciais finais do banco (`DB_USER` e `DB_PASSWORD`) e a chave da IA (`GEMINI_API_KEY`). A estrutura já está pronta — é literalmente preencher isso e ligar o motor 😎
