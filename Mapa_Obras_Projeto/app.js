@@ -1,4 +1,7 @@
-import { OBRAS, ULTIMA_DATA_BASE } from "./data.js";
+// ─── Dados carregados dinamicamente via API ───────────────────────────────────
+// Substituiu o import estático de data.js — agora vem do banco em tempo real
+let OBRAS = [];
+let ULTIMA_DATA_BASE = null;
 
 /** ========= util ========= */
 function norm(s){ return (s ?? "").toString().trim().toLowerCase(); }
@@ -192,6 +195,15 @@ const header = `
         <div><b>Região:</b> ${escapeHtml(obra.region ?? "—")}</div>
         ${dtStr ? `<div><b>Base até:</b> ${escapeHtml(dtStr)}</div>` : ""}
       </div>
+
+      ${obra.aterro_zero
+        ? `<div style="display:inline-flex;align-items:center;gap:6px;background:#fff8e1;border:1px solid #f0b429;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:#b07d00;margin-bottom:8px">
+             <span style="font-size:14px">♻️</span> Aterro Zero — este local já foi usado como destino
+           </div>`
+        : `<div style="display:inline-flex;align-items:center;gap:6px;background:#f0faf4;border:1px solid #40d27f;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:#1e7a40;margin-bottom:8px">
+             <span style="font-size:14px">🟢</span> Aterro Zero — nunca usado como destino
+           </div>`
+      }
   `;
 
   const rotas = Array.isArray(obra.rotas) ? obra.rotas : [];
@@ -479,8 +491,31 @@ function popularDestinos(){
 }
 
 
-function init(){
-  setStatus("Carregando obras…");
+async function init(){
+  setStatus("Carregando obras do banco…");
+
+  // ── Buscar dados do banco via API serverless ──────────────────────────────
+  try {
+    const res = await fetch("/api/mapa/obras");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    if (!data.ok) throw new Error(data.error || "Resposta inválida da API");
+
+    // Popular variáveis globais (substitui o data.js estático)
+    OBRAS = Array.isArray(data.obras) ? data.obras : [];
+    ULTIMA_DATA_BASE = data.ultima_data_base ?? null;
+
+    if (!OBRAS.length) {
+      setStatus("Nenhuma obra Terra (Traçado) encontrada no banco.");
+    }
+  } catch (err) {
+    console.error("[LandMap] Erro ao carregar obras:", err);
+    setStatus("⚠️ Erro ao carregar obras do banco. Verifique a conexão.");
+    return;
+  }
+
+  // ── Montar filtros e marcadores ───────────────────────────────────────────
   popularRegioes();
   popularClientes();
   popularObras();
@@ -497,7 +532,7 @@ function init(){
 
   readFilters();
   updateMarkersAndList();
-  setStatus("Pronto. Filtros, data da última rota e cores por tipo já estão valendo 😼");
+  setStatus(`Pronto — ${OBRAS.length} obra(s) Terra carregada(s) do banco 😼`);
 }
 
 document.getElementById("btnFiltrar").addEventListener("click", aplicarFoco);
