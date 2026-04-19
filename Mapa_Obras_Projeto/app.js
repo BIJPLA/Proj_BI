@@ -492,30 +492,39 @@ function popularDestinos(){
 
 
 async function init(){
-  setStatus("Carregando obras do banco…");
+  setStatus("Carregando obras…");
 
-  // ── Buscar dados do banco via API serverless ──────────────────────────────
+  // ── 1. Tentar API do banco (dados em tempo real) ──────────────────────────
+  let fonte = "banco";
   try {
     const res = await fetch("/api/mapa/obras");
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
+    if (!data.ok) throw new Error(data.error || "Resposta inválida");
 
-    if (!data.ok) throw new Error(data.error || "Resposta inválida da API");
-
-    // Popular variáveis globais (substitui o data.js estático)
     OBRAS = Array.isArray(data.obras) ? data.obras : [];
     ULTIMA_DATA_BASE = data.ultima_data_base ?? null;
-
-    if (!OBRAS.length) {
-      setStatus("Nenhuma obra Terra (Traçado) encontrada no banco.");
-    }
   } catch (err) {
-    console.error("[LandMap] Erro ao carregar obras:", err);
-    setStatus("⚠️ Erro ao carregar obras do banco. Verifique a conexão.");
-    return;
+    console.warn("[LandMap] API indisponível, usando data.js local:", err.message);
+
+    // ── 2. Fallback: data.js estático (sempre funciona) ─────────────────────
+    fonte = "local";
+    try {
+      const mod = await import("./data.js");
+      OBRAS = mod.OBRAS ?? [];
+      ULTIMA_DATA_BASE = mod.ULTIMA_DATA_BASE ?? null;
+    } catch (e2) {
+      console.error("[LandMap] data.js também falhou:", e2);
+      setStatus("⚠️ Não foi possível carregar as obras.");
+      return;
+    }
   }
 
-  // ── Montar filtros e marcadores ───────────────────────────────────────────
+  if (!OBRAS.length) {
+    setStatus("Nenhuma obra encontrada.");
+  }
+
+  // ── 3. Montar filtros e marcadores ────────────────────────────────────────
   popularRegioes();
   popularClientes();
   popularObras();
@@ -532,7 +541,12 @@ async function init(){
 
   readFilters();
   updateMarkersAndList();
-  setStatus(`Pronto — ${OBRAS.length} obra(s) Terra carregada(s) do banco 😼`);
+
+  if (fonte === "banco") {
+    setStatus(`Pronto — ${OBRAS.length} obra(s) carregada(s) do banco 😼`);
+  } else {
+    setStatus(`Pronto — ${OBRAS.length} obra(s) (dados locais · API offline)`);
+  }
 }
 
 document.getElementById("btnFiltrar").addEventListener("click", aplicarFoco);
