@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calc. Terra — LandApp</title>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Icons & Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <!-- XLSX + jsPDF + autotable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- React 18 -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#f1f5f9;
+      --card:#ffffff;
+      --border:#e2e8f0;
+      --text:#1e293b;
+      --muted:#64748b;
+      --muted2:#94a3b8;
+      --orange:#f15500;
+      --orange-soft:#fff4ed;
+      --blue:#0284c7;
+      --blue-soft:#f0f9ff;
+      --green:#059669;
+      --green-soft:#f0fdf4;
+      --amber:#d97706;
+      --amber-soft:#fffbeb;
+      --radius:12px;
+      --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.05);
+      --shadow-lg:0 4px 24px rgba(0,0,0,.10),0 1px 4px rgba(0,0,0,.06);
+    }
+    html,body{height:100%;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+    #root{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar{width:6px;height:6px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:6px}
+
+    /* ── Leaflet popup ── */
+    .leaflet-popup-content-wrapper{border-radius:10px!important;box-shadow:0 8px 24px rgba(0,0,0,.14)!important}
+    .leaflet-popup-content{margin:10px 14px!important;font-family:"Segoe UI",sans-serif!important;font-size:12px!important}
+
+    /* ── Animations ── */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .anim-fade-up{animation:fadeUp .35s cubic-bezier(.22,1,.36,1) both}
+    .anim-fade-in{animation:fadeIn .25s ease both}
+
+    /* ── Responsividade ── */
+    /* Grid de 2 colunas das tabelas */
+    .terra-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    @media(max-width:860px){.terra-grid-2{grid-template-columns:1fr}}
+
+    /* Seção mapa+filtro: em telas pequenas empilha */
+    .terra-map-row{display:flex;flex:1 1 0;min-height:0;overflow:hidden}
+    @media(max-width:720px){
+      .terra-map-row{flex-direction:column}
+      .terra-filter-col{width:100%!important;max-height:200px;flex-shrink:0;border-right:none!important;border-bottom:1px solid rgba(255,255,255,.08)!important;flex-direction:row!important;flex-wrap:wrap;overflow-x:auto}
+      .terra-filter-col .filter-scroll{display:flex;flex-direction:row;flex-wrap:nowrap;gap:8px;overflow-x:auto;padding:8px 12px!important}
+      .terra-filter-col .filter-scroll>div{min-width:120px}
+    }
+
+    /* Formulário compacto: quebra melhor */
+    @media(max-width:640px){
+      .terra-compact-form>div{flex-basis:100%!important;min-width:0!important}
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Carregar OBRAS do LandMap via módulo ES -->
+<script type="module">
+  import { OBRAS } from "../../Mapa_Obras_Projeto/data.js";
+  window.__OBRAS__ = OBRAS;
+  window.dispatchEvent(new Event("obras-ready"));
+</script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+/* ── Hook responsivo ──────────────────────────────────────────────────────── */
+function useWindowWidth(){
+  const [w,setW]=useState(typeof window!=='undefined'?window.innerWidth:1280);
+  useEffect(()=>{
+    const fn=()=>setW(window.innerWidth);
+    window.addEventListener('resize',fn);
+    return()=>window.removeEventListener('resize',fn);
+  },[]);
+  return w;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   CONSTANTES (extraídas do Script_Destino.js original)
+══════════════════════════════════════════════════════════════════════════════ */
+const DESTINOS_LIST = [
+  {nome:"CAVA",         coord:[-46.8120278,-23.5148333], status:"Ativo"},
+  {nome:"Empreiterra",  coord:[-46.5585531,-23.4747267], status:"Ativo"},
+  {nome:"Imbulix",      coord:[-46.841689, -23.662857],  status:"Ativo"},
+  {nome:"Itaquareia",   coord:[-46.343509, -23.473241],  status:"Ativo"},
+  {nome:"Parmv",        coord:[-46.535480, -23.483620],  status:"Ativo"},
+  {nome:"Temari",       coord:[-46.4647502,-23.4148032], status:"Inativo"},
+  {nome:"Nova Ambiental",coord:[-46.9783503,-23.5264676],status:"Ativo"},
+  {nome:"CDR Pedreira", coord:[-46.5629714,-23.4126744], status:"Ativo"},
+  {nome:"Essencis",     coord:[-46.786638, -23.356849],  status:"Ativo"},
+  {nome:"Olifar",       coord:[-46.674365, -23.767057],  status:"Ativo"},
+  {nome:"Lara",         coord:[-46.473925, -23.704714],  status:"Ativo"},
+  {nome:"Carmosina",    coord:[-46.428443, -23.588269],  status:"Inativa"},
+  {nome:"Mombaça",      coord:[-46.849432, -23.747264],  status:"Ativo"},
+  {nome:"HSH",          coord:[-46.399498, -23.481151],  status:"Ativo"},
+  {nome:"JS dos Santos",coord:[-46.770521, -23.438445],  status:"Ativo"},
+  {nome:"Geoincorp",    coord:[-46.931481, -23.617269],  status:"Ativo"},
+  {nome:"Maria Amélia", coord:[-46.435534, -23.380559],  status:"Ativo"},
+  {nome:"Sanca",        coord:[-46.59873,  -23.52481],   status:"Ativo"},
+];
+const DMT_TABLE = {
+  "CAVA":          {Norte:1.15,Oeste:1.15,Leste:1.15,Sul:1.15},
+  "Empreiterra":   {Norte:1.2, Oeste:1.2, Leste:1.25,Sul:1.2},
+  "Essencis":      {Norte:1.35,Oeste:1.3, Leste:1.25,Sul:1.3},
+  "Imbulix":       {Norte:1.2, Oeste:1.15,Leste:1.25,Sul:1.15},
+  "Itaquareia":    {Norte:1.1, Oeste:1.1, Leste:1.1, Sul:1.1},
+  "Olifar":        {Norte:1.6, Oeste:1.3, Leste:1.6, Sul:1.3},
+  "Temari":        {Norte:1.2, Oeste:1.2, Leste:1.2, Sul:1.2},
+  "Mombaça":       {Norte:1.2, Oeste:1.2, Leste:1.2, Sul:1.2},
+  "Carmosina":     {Norte:1.35,Oeste:1.3, Leste:1.35,Sul:1.3},
+  "Nova Ambiental":{Norte:1.25,Oeste:1.2, Leste:1.25,Sul:1.2},
+  "CDR Pedreira":  {Norte:1.3, Oeste:1.3, Leste:1.3, Sul:1.5},
+  "Lara":          {Norte:1.35,Oeste:1.35,Leste:1.35,Sul:1.35},
+  "JS dos Santos": {Norte:1.2, Oeste:1.2, Leste:1.2, Sul:1.2},
+  "Geoincorp":     {Norte:1.25,Oeste:1.2, Leste:1.25,Sul:1.2},
+  "Sanca":         {Norte:1.25,Oeste:1.25,Leste:1.25,Sul:1.3},
+  "Parmv":         {Norte:1.25,Oeste:1.25,Leste:1.25,Sul:1.3},
+  "Maria Amélia":  {Norte:1.3, Oeste:1.3, Leste:1.3, Sul:1.3},
+};
+const ORS_KEY = '5b3ce3597851110001cf62489ba64b90dd6d4ab8bcc92d787f377d8d';
+const LOGO_URL = '../../Imagens/Logo_Plataforma_Preto.png';
+
+/* ── Helpers ─────────────────────────────────────────────────────────────── */
+function distKm(la1,ln1,la2,ln2){const R=6371,d=Math.PI/180,dLa=(la2-la1)*d,dLn=(ln2-ln1)*d,a=Math.sin(dLa/2)**2+Math.cos(la1*d)*Math.cos(la2*d)*Math.sin(dLn/2)**2;return 2*R*Math.asin(Math.sqrt(a));}
+function fmtBRL(v){if(v==null)return'—';const n=Number(v);return isFinite(n)?new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n):'—';}
+function fmtDate(v){if(!v)return'—';const d=new Date(String(v).replace(' ','T'));return isNaN(d)?String(v).slice(0,10):d.toLocaleDateString('pt-BR');}
+function volLabel(r){const s=(r??'').toUpperCase();if(s.includes('CUT'))return'Corte';if(s.includes('TRUCK'))return'Caminhão';if(s.includes('RUBBLE'))return'Entulho';return r||'—';}
+function volColor(r){const s=(r??'').toUpperCase();if(s.includes('CUT'))return'#f59e0b';if(s.includes('TRUCK'))return'#0ea5e9';if(s.includes('RUBBLE'))return'#10b981';return'#94a3b8';}
+
+async function geocode(addr){
+  const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=br&q=${encodeURIComponent(addr+', São Paulo, Brasil')}`,{headers:{'Accept':'application/json'}});
+  const d=await r.json();
+  if(!d||!d[0])throw new Error('Endereço não encontrado');
+  return[parseFloat(d[0].lon),parseFloat(d[0].lat)];
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   COMPONENTE: Header
+══════════════════════════════════════════════════════════════════════════════ */
+function Header({onReset,hasResults}){
+  return(
+    <header style={{background:'#fff',borderBottom:'1px solid var(--border)',padding:'0 20px',height:56,display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,boxShadow:'0 1px 0 #e2e8f0'}}>
+      <div style={{display:'flex',alignItems:'center',gap:10}}>
+        <div style={{width:34,height:34,borderRadius:9,background:'linear-gradient(135deg,#f15500,#c94000)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16}}>🏗️</div>
+        <div>
+          <div style={{fontSize:14,fontWeight:800,color:'var(--text)',lineHeight:1.2}}>Calculadora Terra</div>
+          <div style={{fontSize:11,color:'var(--muted)',lineHeight:1.2}}>Destinos + Obras Próximas</div>
+        </div>
+      </div>
+      {hasResults&&<button onClick={onReset} style={{padding:'6px 14px',borderRadius:8,border:'1px solid var(--border)',background:'var(--bg)',color:'var(--muted)',fontSize:12,fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',gap:5,transition:'all .15s'}} onMouseEnter={e=>e.target.style.borderColor='#94a3b8'} onMouseLeave={e=>e.target.style.borderColor='var(--border)'}><i className="fas fa-redo" style={{fontSize:11}}/> Nova consulta</button>}
+    </header>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   COMPONENTE: Formulário
+══════════════════════════════════════════════════════════════════════════════ */
+function FormPanel({form,onChange,onCalc,onPDF,loading,compact}){
+  const inp={width:'100%',padding:'9px 12px',borderRadius:8,border:'1px solid var(--border)',fontSize:13,color:'var(--text)',outline:'none',background:'#fff',transition:'border-color .15s'};
+  const sel={...inp,cursor:'pointer',appearance:'none',backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,backgroundRepeat:'no-repeat',backgroundPosition:'right 10px center',paddingRight:28};
+  const lbl={fontSize:11,fontWeight:700,color:'var(--muted)',marginBottom:4,display:'block',textTransform:'uppercase',letterSpacing:.5};
+  const focus=e=>e.target.style.borderColor='#f15500';
+  const blur=e=>e.target.style.borderColor='var(--border)';
+
+  if(compact){
+    return(
+      <div style={{background:'#fff',borderBottom:'1px solid var(--border)',padding:'10px 14px',flexShrink:0}}>
+        <div className="terra-compact-form" style={{display:'flex',gap:8,alignItems:'flex-end',flexWrap:'wrap'}}>
+          <div style={{flex:'1 1 130px',minWidth:110}}>
+            <label style={lbl}>Nome da Obra</label>
+            <input style={inp} value={form.nomeObra} placeholder="Nome da obra" onChange={e=>onChange({...form,nomeObra:e.target.value})} onFocus={focus} onBlur={blur}/>
+          </div>
+          <div style={{flex:'1 1 90px',minWidth:80}}>
+            <label style={lbl}>Zona</label>
+            <select style={sel} value={form.zona} onChange={e=>onChange({...form,zona:e.target.value})}>
+              {['Sul','Norte','Leste','Oeste'].map(z=><option key={z}>{z}</option>)}
+            </select>
+          </div>
+          <div style={{flex:'1 1 110px',minWidth:100}}>
+            <label style={lbl}>Equipamento</label>
+            <select style={sel} value={form.equipamento} onChange={e=>onChange({...form,equipamento:e.target.value})}>
+              <option>Grande Porte</option><option>Pequeno Porte</option>
+            </select>
+          </div>
+          <div style={{flex:'1 1 90px',minWidth:80}}>
+            <label style={lbl}>Região</label>
+            <select style={sel} value={form.regiao} onChange={e=>onChange({...form,regiao:e.target.value})}>
+              <option>Bairro</option><option>Marginal</option>
+            </select>
+          </div>
+          <div style={{flex:'2 1 200px',minWidth:160}}>
+            <label style={lbl}>Endereço de Origem</label>
+            <input style={inp} value={form.endereco} placeholder="Ex: Rua Vícudo de Brito, 785, SP" onChange={e=>onChange({...form,endereco:e.target.value})} onFocus={focus} onBlur={blur} onKeyDown={e=>e.key==='Enter'&&!loading&&onCalc()}/>
+          </div>
+          <div style={{display:'flex',gap:6,flexShrink:0,flexWrap:'wrap'}}>
+            <button onClick={onCalc} disabled={loading||!form.endereco.trim()} style={{padding:'9px 16px',borderRadius:8,border:'none',background:loading||!form.endereco.trim()?'#cbd5e1':'linear-gradient(135deg,#f15500,#c94000)',color:'#fff',fontWeight:700,fontSize:13,cursor:loading||!form.endereco.trim()?'default':'pointer',display:'flex',alignItems:'center',gap:7,whiteSpace:'nowrap',transition:'all .15s'}}>
+              {loading?<><span style={{width:14,height:14,border:'2px solid rgba(255,255,255,.4)',borderTopColor:'#fff',borderRadius:'50%',display:'inline-block',animation:'spin .7s linear infinite'}}/> Calculando...</>:<><i className="fas fa-route"/> Calcular</>}
+            </button>
+            {onPDF&&<button onClick={onPDF} style={{padding:'9px 14px',borderRadius:8,border:'none',background:'linear-gradient(135deg,#1e293b,#0f172a)',color:'#fff',fontWeight:700,fontSize:13,cursor:'pointer',display:'flex',alignItems:'center',gap:7,whiteSpace:'nowrap',transition:'all .15s'}} onMouseEnter={e=>e.currentTarget.style.opacity='.85'} onMouseLeave={e=>e.currentTarget.style.opacity='1'}><i className="fas fa-file-pdf" style={{color:'#f87171'}}/> PDF</button>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return(
+    <div style={{display:'flex',justifyContent:'center',alignItems:'center',flex:1,padding:40}}>
+      <div style={{background:'var(--card)',borderRadius:16,border:'1px solid var(--border)',boxShadow:'var(--shadow-lg)',padding:32,width:'100%',maxWidth:560}} className="anim-fade-up">
+        <div style={{textAlign:'center',marginBottom:24}}>
+          <div style={{fontSize:36,marginBottom:8}}>🏗️</div>
+          <h2 style={{fontSize:18,fontWeight:800,color:'var(--text)'}}>Calculadora Terra</h2>
+          <p style={{fontSize:13,color:'var(--muted)',marginTop:4}}>Calcule rotas para aterros e veja obras LandApp próximas</p>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',gap:14}}>
+          <div>
+            <label style={lbl}>Nome da Obra</label>
+            <input style={inp} value={form.nomeObra} placeholder="Nome da obra" onChange={e=>onChange({...form,nomeObra:e.target.value})} onFocus={focus} onBlur={blur}/>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
+            <div><label style={lbl}>Zona</label><select style={sel} value={form.zona} onChange={e=>onChange({...form,zona:e.target.value})}>{['Sul','Norte','Leste','Oeste'].map(z=><option key={z}>{z}</option>)}</select></div>
+            <div><label style={lbl}>Equipamento</label><select style={sel} value={form.equipamento} onChange={e=>onChange({...form,equipamento:e.target.value})}><option>Grande Porte</option><option>Pequeno Porte</option></select></div>
+            <div><label style={lbl}>Região</label><select style={sel} value={form.regiao} onChange={e=>onChange({...form,regiao:e.target.value})}><option>Bairro</option><option>Marginal</option></select></div>
+          </div>
+          <div>
+            <label style={lbl}>Endereço de Origem</label>
+            <input style={inp} value={form.endereco} placeholder="Ex: Rua Vícudo de Brito, 785, São Paulo" onChange={e=>onChange({...form,endereco:e.target.value})} onFocus={focus} onBlur={blur} onKeyDown={e=>e.key==='Enter'&&!loading&&onCalc()}/>
+          </div>
+          <button onClick={onCalc} disabled={loading||!form.endereco.trim()} style={{marginTop:4,padding:'12px',borderRadius:10,border:'none',background:loading||!form.endereco.trim()?'#cbd5e1':'linear-gradient(135deg,#f15500,#c94000)',color:'#fff',fontWeight:700,fontSize:14,cursor:loading||!form.endereco.trim()?'default':'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,transition:'all .15s'}}>
+            {loading?<><span style={{width:16,height:16,border:'2px solid rgba(255,255,255,.4)',borderTopColor:'#fff',borderRadius:'50%',display:'inline-block',animation:'spin .7s linear infinite'}}/> Calculando rotas e obras...</>:<><i className="fas fa-route"/> Calcular Rotas</>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   COMPONENTE: Badge / Chips
+══════════════════════════════════════════════════════════════════════════════ */
+function StatusBadge({status}){
+  const active=status==='Ativo';
+  return <span style={{display:'inline-flex',alignItems:'center',gap:4,padding:'2px 8px',borderRadius:20,fontSize:11,fontWeight:700,background:active?'#dcfce7':'#fee2e2',color:active?'#15803d':'#b91c1c'}}><span style={{width:5,height:5,borderRadius:'50%',background:'currentColor',display:'inline-block'}}/>{status}</span>;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   COMPONENTE: Tabela Destinos
+══════════════════════════════════════════════════════════════════════════════ */
+function TabelaDestinos({rows}){
+  const [sort,setSort]=useState({col:2,asc:true});
+  const sorted=useMemo(()=>{
+    return [...rows].sort((a,b)=>{
+      const va=a[sort.col],vb=b[sort.col];
+      const na=parseFloat(String(va).replace(/[^\d.]/g,'')),nb=parseFloat(String(vb).replace(/[^\d.]/g,''));
+      const res=isFinite(na)&&isFinite(nb)?na-nb:String(va).localeCompare(String(vb));
+      return sort.asc?res:-res;
+    });
+  },[rows,sort]);
+
+  const th=(label,col,align='left')=>(
+    <th onClick={()=>setSort(s=>({col,asc:s.col===col?!s.asc:true}))} style={{padding:'9px 12px',textAlign:align,fontWeight:700,fontSize:11,color:'#0369a1',background:'#f0f9ff',borderBottom:'2px solid #bae6fd',cursor:'pointer',whiteSpace:'nowrap',userSelect:'none'}}>
+      {label} <span style={{color:'#93c5fd'}}>{sort.col===col?(sort.asc?'↑':'↓'):'↕'}</span>
+    </th>
+  );
+
+  return(
+    <div style={{overflowX:'auto'}}>
+      <table style={{width:'100%',borderCollapse:'collapse',fontSize:12.5}}>
+        <thead><tr>{th('Destino',0)}{th('Status',1)}{th('Distância',2,'right')}{th('Duração',3,'right')}{th('DMT',4,'right')}{th('Preço',5,'right')}{th('+3km',6,'right')}{th('+5km',7,'right')}<th style={{padding:'9px 12px',background:'#f0f9ff',borderBottom:'2px solid #bae6fd',fontSize:11,fontWeight:700,color:'#0369a1'}}>Rota</th></tr></thead>
+        <tbody>
+          {sorted.map((r,i)=>(
+            <tr key={i} style={{transition:'background .12s'}} onMouseEnter={e=>e.currentTarget.style.background='#f8fafc'} onMouseLeave={e=>e.currentTarget.style.background=''}>
+              <td style={{padding:'9px 12px',fontWeight:600,color:'var(--text)',borderBottom:'1px solid #f1f5f9'}}>{r[0]}</td>
+              <td style={{padding:'9px 12px',borderBottom:'1px solid #f1f5f9'}}><StatusBadge status={r[1]}/></td>
+              {[2,3,4].map(c=><td key={c} style={{padding:'9px 12px',textAlign:'right',color:'var(--muted)',borderBottom:'1px solid #f1f5f9',whiteSpace:'nowrap'}}>{r[c]}</td>)}
+              {[5,6,7].map(c=><td key={c} style={{padding:'9px 12px',textAlign:'right',fontWeight:600,color:'var(--text)',borderBottom:'1px solid #f1f5f9',whiteSpace:'nowrap'}}>{r[c]}</td>)}
+              <td style={{padding:'9px 12px',borderBottom:'1px solid #f1f5f9'}}><a href={r[8]} target="_blank" rel="noreferrer" style={{color:'#0284c7',textDecoration:'none',fontWeight:600,fontSize:11}}>Ver rota →</a></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   COMPONENTE: Tabela Obras Próximas
+══════════════════════════════════════════════════════════════════════════════ */
+function TabelaObras({obras,onSelect}){
+  const [expanded,setExpanded]=useState({});
+  const toggle=i=>setExpanded(e=>({...e,[i]:!e[i]}));
+  const rankStyle=i=>{
+    if(i===0)return{bg:'linear-gradient(135deg,#fbbf24,#d97706)',color:'#fff'};
+    if(i===1)return{bg:'linear-gradient(135deg,#94a3b8,#64748b)',color:'#fff'};
+    if(i===2)return{bg:'linear-gradient(135deg,#cd7f5a,#92400e)',color:'#fff'};
+    return{bg:'#f1f5f9',color:'#64748b'};
+  };
+
+  return(
+    <div>
+      {obras.map((o,i)=>{const rk=rankStyle(i);return(
+        <div key={i} style={{marginBottom:i<obras.length-1?8:0,border:'1px solid var(--border)',borderRadius:10,overflow:'hidden',transition:'box-shadow .15s',cursor:'pointer'}} onMouseEnter={e=>e.currentTarget.style.boxShadow='var(--shadow)'} onMouseLeave={e=>e.currentTarget.style.boxShadow='none'} onClick={()=>onSelect&&onSelect(o.id_obra)}>
+          {/* Row */}
+          <div style={{display:'grid',gridTemplateColumns:'36px 1fr 90px 140px 80px 100px auto',alignItems:'center',gap:8,padding:'10px 12px',background:'#fff'}}>
+            <span style={{width:28,height:28,borderRadius:'50%',background:rk.bg,display:'flex',alignItems:'center',justifyContent:'center',color:rk.color,fontWeight:900,fontSize:11,border:i>=3?'1px solid #e2e8f0':'none'}}>{i+1}°</span>
+            <div>
+              <div style={{fontWeight:700,fontSize:13,color:'var(--text)',lineHeight:1.3}}>{o.obra_nome}</div>
+              <div style={{fontSize:11,color:'var(--muted)'}}>{o.cliente||'—'}</div>
+            </div>
+            <span style={{display:'inline-flex',alignItems:'center',gap:3,background:'#eff6ff',border:'1px solid #bfdbfe',color:'#1d4ed8',borderRadius:20,padding:'3px 9px',fontSize:11,fontWeight:700,whiteSpace:'nowrap'}}>📍 {o._d.toFixed(1)} km</span>
+            <div>
+              <div style={{fontSize:12,color:'var(--text)'}}>{o.city||'—'}</div>
+              <div style={{fontSize:11,color:'var(--muted2)'}}>{o.neighborhood||''}</div>
+            </div>
+            <span style={{display:'inline-block',background:'#f0fdf4',border:'1px solid #bbf7d0',color:'#15803d',borderRadius:20,padding:'3px 9px',fontSize:11,fontWeight:700}}>{volLabel(o.volume_type_raw)}</span>
+            <div style={{fontSize:11,color:'var(--muted)'}}>{fmtDate(o.ultima_data_rota)}</div>
+            {(o.rotas||[]).length>0&&(
+              <button onClick={e=>{e.stopPropagation();toggle(i);}} style={{padding:'4px 10px',borderRadius:7,border:'1px solid var(--border)',background:'var(--bg)',color:'var(--muted)',fontSize:11,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap',transition:'all .13s'}} onMouseEnter={e=>{e.currentTarget.style.background='#fef3c7';e.currentTarget.style.borderColor='#fcd34d'}} onMouseLeave={e=>{e.currentTarget.style.background='var(--bg)';e.currentTarget.style.borderColor='var(--border)'}}>
+                {(o.rotas||[]).length} rota{(o.rotas||[]).length>1?'s':''} {expanded[i]?'▴':'▾'}
+              </button>
+            )}
+          </div>
+          {/* Sub-rotas */}
+          {expanded[i]&&(
+            <div style={{padding:'0 12px 12px',background:'#fafbfe',animation:'fadeIn .2s ease'}} className="anim-fade-in">
+              <table style={{width:'100%',borderCollapse:'collapse',fontSize:11.5,borderRadius:8,overflow:'hidden',border:'1px solid var(--border)'}}>
+                <thead><tr style={{background:'#f1f5f9'}}>
+                  {['Rota','Destino','Preço Cliente','Preço Motorista','Preço Destino','Última data'].map(h=>(
+                    <th key={h} style={{padding:'7px 10px',textAlign:'left',fontWeight:700,color:'var(--muted)',fontSize:10.5,borderBottom:'1px solid var(--border)'}}>{h}</th>
+                  ))}
+                </tr></thead>
+                <tbody>
+                  {(o.rotas||[]).map((r,j)=>(
+                    <tr key={j} style={{transition:'background .12s'}} onMouseEnter={e=>e.currentTarget.style.background='#fff9f0'} onMouseLeave={e=>e.currentTarget.style.background=''}>
+                      <td style={{padding:'7px 10px',fontWeight:600,fontSize:12,borderBottom:'1px solid #f1f5f9'}}>{r.rota_nome||'—'}</td>
+                      <td style={{padding:'7px 10px',borderBottom:'1px solid #f1f5f9',color:'var(--muted)'}}>{r.destino_nome||'—'}</td>
+                      {[r.preco_cliente,r.preco_motorista,r.preco_destino].map((v,k)=>(
+                        <td key={k} style={{padding:'7px 10px',borderBottom:'1px solid #f1f5f9',fontWeight:600,color:'var(--text)'}}>{fmtBRL(v)}</td>
+                      ))}
+                      <td style={{padding:'7px 10px',borderBottom:'1px solid #f1f5f9',color:'var(--muted)',fontSize:11}}>{fmtDate(r.ultima_data_rota)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      );})}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   COMPONENTE: Painel de Filtros (tema escuro, estilo LandMap)
+══════════════════════════════════════════════════════════════════════════════ */
+const EMPTY_FILTERS={cliente:'',obraNome:'',destino:'',tipo:'Todos',regiao:'Todas',bairro:'',dataInicio:'',dataFim:''};
+
+function FilterPanel({filters,pending,onChange,onApply,onClear,total,filtered,filterOptions,compact}){
+  const inp={width:'100%',padding:'7px 10px',borderRadius:7,border:'1px solid rgba(255,255,255,.12)',background:'rgba(255,255,255,.07)',color:'#e2e8f0',fontSize:12,outline:'none',transition:'border-color .15s',boxSizing:'border-box'};
+  const sel={...inp,cursor:'pointer',appearance:'none',backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,backgroundRepeat:'no-repeat',backgroundPosition:'right 9px center',paddingRight:24};
+  const lbl={fontSize:10,fontWeight:700,color:'#94a3b8',marginBottom:4,display:'block',textTransform:'uppercase',letterSpacing:.5};
+  const foc=e=>{e.target.style.borderColor='#f15500';e.target.style.background='rgba(255,255,255,.10)';};
+  const blr=e=>{e.target.style.borderColor='rgba(255,255,255,.12)';e.target.style.background='rgba(255,255,255,.07)';};
+  const hasFilters=Object.values(filters).some(v=>v&&v!=='Todos'&&v!=='Todas');
+
+  // Modo compacto (telas pequenas): scroll horizontal em linha
+  if(compact){
+    return(
+      <div style={{background:'#1a2535',color:'#e2e8f0',flexShrink:0,borderBottom:'1px solid rgba(255,255,255,.08)',display:'flex',flexDirection:'column',overflow:'hidden',maxHeight:180}}>
+        <div style={{overflowX:'auto',display:'flex',gap:8,padding:'8px 10px',alignItems:'flex-end',flexWrap:'nowrap'}}>
+          {[
+            {lbl:'Cliente',key:'cliente',opts:filterOptions?.clientes},
+            {lbl:'Destino',key:'destino',opts:filterOptions?.destinos},
+            {lbl:'Tipo',key:'tipo',opts:['Todos','Corte','Caminhão','Entulho'],fixed:true},
+            {lbl:'Região',key:'regiao',opts:['Todas','Norte','Sul','Leste','Oeste','Centro'],fixed:true},
+            {lbl:'Bairro',key:'bairro',opts:filterOptions?.bairros},
+          ].map(({lbl:l,key,opts,fixed})=>(
+            <div key={key} style={{minWidth:120,flexShrink:0}}>
+              <label style={{...lbl,marginBottom:3}}>{l}</label>
+              <select style={{...sel,fontSize:11,padding:'5px 22px 5px 8px'}} value={pending[key]} onChange={e=>onChange({...pending,[key]:e.target.value})} onFocus={foc} onBlur={blr}>
+                {fixed?(opts||[]).map(o=><option key={o}>{o}</option>):<><option value="">{l==='Região'?'Todas':'Todos'}</option>{(opts||[]).map(o=><option key={o} value={o}>{o}</option>)}</>}
+              </select>
+            </div>
+          ))}
+          <div style={{display:'flex',gap:5,flexShrink:0,paddingBottom:2}}>
+            <button onClick={onApply} style={{padding:'5px 12px',borderRadius:7,border:'none',background:'linear-gradient(135deg,#f15500,#c94000)',color:'#fff',fontWeight:700,fontSize:11,cursor:'pointer',whiteSpace:'nowrap'}}>Aplicar</button>
+            <button onClick={onClear} style={{padding:'5px 10px',borderRadius:7,border:'1px solid rgba(255,255,255,.14)',background:'rgba(255,255,255,.06)',color:'#94a3b8',fontWeight:700,fontSize:11,cursor:'pointer'}}>Limpar</button>
+          </div>
+        </div>
+        {hasFilters&&<div style={{fontSize:10,color:'#64748b',padding:'0 10px 6px'}}>{filtered} de {total} obras</div>}
+      </div>
+    );
+  }
+
+  return(
+    <div style={{width:196,flexShrink:0,background:'#1a2535',color:'#e2e8f0',display:'flex',flexDirection:'column',overflow:'hidden',borderRight:'1px solid rgba(255,255,255,.08)'}}>
+      <div style={{padding:'14px 14px 0',flexShrink:0}}>
+        <div style={{fontSize:13,fontWeight:800,marginBottom:3,color:'#f1f5f9'}}>Filtros</div>
+        <div style={{fontSize:10.5,color:'#64748b',lineHeight:1.5,marginBottom:10}}>Esses filtros controlam quais obras aparecem no mapa e na lista.</div>
+        <button onClick={onClear} style={{display:'inline-flex',alignItems:'center',gap:5,padding:'3px 10px',borderRadius:20,background:hasFilters?'rgba(241,85,0,.2)':'rgba(255,255,255,.07)',border:hasFilters?'1px solid rgba(241,85,0,.5)':'1px solid rgba(255,255,255,.14)',color:hasFilters?'#f15500':'#94a3b8',fontSize:11,fontWeight:700,cursor:'pointer',marginBottom:12,transition:'all .15s'}}>
+          {hasFilters?<><i className="fas fa-times-circle" style={{fontSize:10}}/> Limpar filtros</>:<><i className="fas fa-filter" style={{fontSize:10}}/> Sem filtros</>}
+        </button>
+        {hasFilters&&<div style={{fontSize:10,color:'#64748b',marginBottom:8}}>{filtered} de {total} obras</div>}
+      </div>
+      <div style={{flex:1,overflowY:'auto',padding:'0 14px',display:'flex',flexDirection:'column',gap:10,paddingBottom:10}}>
+        <div><label style={lbl}>Cliente</label>
+          <select style={sel} value={pending.cliente} onChange={e=>onChange({...pending,cliente:e.target.value})} onFocus={foc} onBlur={blr}>
+            <option value="">Todos</option>
+            {(filterOptions?.clientes||[]).map(c=><option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div><label style={lbl}>Nome da Obra</label>
+          <select style={sel} value={pending.obraNome} onChange={e=>onChange({...pending,obraNome:e.target.value})} onFocus={foc} onBlur={blr}>
+            <option value="">Todas</option>
+            {(filterOptions?.obraNames||[]).map(n=><option key={n} value={n}>{n}</option>)}
+          </select>
+        </div>
+        <div><label style={lbl}>Destino</label>
+          <select style={sel} value={pending.destino} onChange={e=>onChange({...pending,destino:e.target.value})} onFocus={foc} onBlur={blr}>
+            <option value="">Todos</option>
+            {(filterOptions?.destinos||[]).map(d=><option key={d} value={d}>{d}</option>)}
+          </select>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+          <div><label style={lbl}>Tipo</label>
+            <select style={sel} value={pending.tipo} onChange={e=>onChange({...pending,tipo:e.target.value})} onFocus={foc} onBlur={blr}>
+              <option>Todos</option><option>Corte</option><option>Caminhão</option><option>Entulho</option>
+            </select>
+          </div>
+          <div><label style={lbl}>Região</label>
+            <select style={sel} value={pending.regiao} onChange={e=>onChange({...pending,regiao:e.target.value})} onFocus={foc} onBlur={blr}>
+              <option>Todas</option><option>Norte</option><option>Sul</option><option>Leste</option><option>Oeste</option><option>Centro</option>
+            </select>
+          </div>
+        </div>
+        <div><label style={lbl}>Bairro</label>
+          <select style={sel} value={pending.bairro} onChange={e=>onChange({...pending,bairro:e.target.value})} onFocus={foc} onBlur={blr}>
+            <option value="">Todos</option>
+            {(filterOptions?.bairros||[]).map(b=><option key={b} value={b}>{b}</option>)}
+          </select>
+        </div>
+        <div>
+          <label style={lbl}>Última data da rota — início</label>
+          <input type="date" style={{...inp,colorScheme:'dark'}} value={pending.dataInicio} onChange={e=>onChange({...pending,dataInicio:e.target.value})} onFocus={foc} onBlur={blr}/>
+        </div>
+        <div>
+          <label style={lbl}>Última data da rota — fim</label>
+          <input type="date" style={{...inp,colorScheme:'dark'}} value={pending.dataFim} onChange={e=>onChange({...pending,dataFim:e.target.value})} onFocus={foc} onBlur={blr}/>
+        </div>
+      </div>
+      <div style={{padding:12,flexShrink:0,borderTop:'1px solid rgba(255,255,255,.08)',display:'flex',gap:7}}>
+        <button onClick={onApply} style={{flex:1,padding:'8px',borderRadius:8,border:'none',background:'linear-gradient(135deg,#f15500,#c94000)',color:'#fff',fontWeight:700,fontSize:12,cursor:'pointer',transition:'all .15s'}} onMouseEnter={e=>e.currentTarget.style.opacity='.88'} onMouseLeave={e=>e.currentTarget.style.opacity='1'}>Aplicar filtros</button>
+        <button onClick={onClear} style={{flex:1,padding:'8px',borderRadius:8,border:'1px solid rgba(255,255,255,.14)',background:'rgba(255,255,255,.06)',color:'#94a3b8',fontWeight:700,fontSize:12,cursor:'pointer',transition:'all .15s'}} onMouseEnter={e=>e.currentTarget.style.borderColor='rgba(255,255,255,.3)'} onMouseLeave={e=>e.currentTarget.style.borderColor='rgba(255,255,255,.14)'}>Limpar</button>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   COMPONENTE: Mapa — obras filtradas + aterros (pins vermelhos) + origem
+══════════════════════════════════════════════════════════════════════════════ */
+function MapPanel({obras,origin,aterros,selectedObraId}){
+  const mapRef=useRef(null);
+  const mapInstanceRef=useRef(null);
+  const obrasMarkersRef=useRef([]);
+  const aterrosMarkersRef=useRef([]);
+  const originMarkerRef=useRef(null);
+
+  function makePin(color,w=24,h=38){
+    return new L.DivIcon({className:'',html:`<svg width="${w}" height="${h}" viewBox="0 0 28 44"><path d="M14 43C14 43 2 28.5 2 18C2 9.2 7.8 3 14 3C20.2 3 26 9.2 26 18C26 28.5 14 43 14 43Z" fill="${color}" stroke="rgba(255,255,255,.85)" stroke-width="2"/><circle cx="14" cy="18" r="5" fill="rgba(0,0,0,.18)"/></svg>`,iconSize:[w,h],iconAnchor:[w/2,h],popupAnchor:[0,-(h-6)]});
+  }
+
+  // Init mapa uma vez
+  useEffect(()=>{
+    if(!mapRef.current||mapInstanceRef.current)return;
+    mapInstanceRef.current=L.map(mapRef.current,{zoomControl:true}).setView([-23.55052,-46.633308],12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mapInstanceRef.current);
+    return()=>{if(mapInstanceRef.current){mapInstanceRef.current.remove();mapInstanceRef.current=null;}};
+  },[]);
+
+  // Atualizar pins de obras quando filtro muda
+  useEffect(()=>{
+    const map=mapInstanceRef.current;
+    if(!map)return;
+    obrasMarkersRef.current.forEach(m=>map.removeLayer(m));
+    obrasMarkersRef.current=[];
+
+    obras.filter(o=>Number.isFinite(o.lat)&&Number.isFinite(o.lng)).forEach(o=>{
+      const c=volColor(o.volume_type_raw);
+      const qtdRotas=(o.rotas||[]).length;
+      const distBadge=o._d!=null?`&nbsp;<b style="color:#1d4ed8">${o._d.toFixed(1)} km</b>`:'';
+      const rotasRows=(o.rotas||[]).slice(0,3).map(r=>`
+        <tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:4px 6px;font-weight:600;font-size:11px">${r.rota_nome||'—'}</td>
+          <td style="padding:4px 6px;font-size:11px;color:#64748b">${r.destino_nome||'—'}</td>
+          <td style="padding:4px 6px;font-size:11px;text-align:right;font-weight:600">${r.preco_cliente!=null?'R$'+r.preco_cliente:'—'}</td>
+        </tr>`).join('');
+      const maisRotas=qtdRotas>3?`<div style="font-size:10px;color:#94a3b8;text-align:center;padding:3px">+${qtdRotas-3} rotas</div>`:'';
+      const mk=L.marker([o.lat,o.lng],{icon:makePin(c)}).addTo(map);
+      mk._obraId=o.id_obra;
+      mk.bindPopup(`<div style="min-width:220px;max-width:280px;font-family:'Segoe UI',sans-serif">
+        <b style="font-size:13px;color:#1e293b">${o.obra_nome||'—'}</b>
+        <div style="font-size:11px;color:#64748b;margin:2px 0 6px">${o.cliente||''}</div>
+        <hr style="border:none;border-top:1px solid #e2e8f0;margin:5px 0"/>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap">
+          <span style="background:${c}22;color:${c};padding:2px 8px;border-radius:10px;font-weight:700;font-size:10px">${volLabel(o.volume_type_raw)}</span>
+          ${distBadge}
+          ${o.region?`<span style="background:#f1f5f9;color:#64748b;padding:2px 7px;border-radius:10px;font-size:10px">${o.region}</span>`:''}
+        </div>
+        <div style="font-size:11px;color:#475569;line-height:1.7">
+          🏙️ ${o.city||'—'}${o.neighborhood?` · ${o.neighborhood}`:''}<br/>
+          📅 Última rota: <b>${fmtDate(o.ultima_data_rota)}</b>
+        </div>
+        ${qtdRotas>0?`<hr style="border:none;border-top:1px solid #e2e8f0;margin:6px 0"/>
+        <div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:4px">ROTAS (${qtdRotas})</div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr style="background:#f8fafc"><th style="padding:3px 6px;text-align:left;font-size:10px;color:#94a3b8">Rota</th><th style="padding:3px 6px;text-align:left;font-size:10px;color:#94a3b8">Destino</th><th style="padding:3px 6px;text-align:right;font-size:10px;color:#94a3b8">Cliente</th></tr></thead>
+          <tbody>${rotasRows}</tbody>
+        </table>${maisRotas}`:''}
+      </div>`,{maxWidth:290});
+      obrasMarkersRef.current.push(mk);
+    });
+  },[obras]);
+
+  // Atualizar pins de aterros
+  useEffect(()=>{
+    const map=mapInstanceRef.current;
+    if(!map)return;
+    aterrosMarkersRef.current.forEach(m=>map.removeLayer(m));
+    aterrosMarkersRef.current=[];
+    (aterros||[]).forEach(a=>{
+      const mk=L.marker([a.coord[1],a.coord[0]],{icon:makePin('#ef4444',22,35)}).addTo(map);
+      mk.bindPopup(`<div style="font-family:'Segoe UI',sans-serif"><b style="font-size:12px;color:#ef4444">🏭 ${a.nome}</b><br/><span style="font-size:11px;color:#64748b">Aterro / Destino · ${a.status}</span></div>`);
+      aterrosMarkersRef.current.push(mk);
+    });
+  },[aterros]);
+
+  // Atualizar pin de origem e ajustar bounds
+  useEffect(()=>{
+    const map=mapInstanceRef.current;
+    if(!map)return;
+    if(originMarkerRef.current){map.removeLayer(originMarkerRef.current);originMarkerRef.current=null;}
+    if(origin){
+      const originIcon=new L.DivIcon({className:'',html:`<svg width="30" height="47" viewBox="0 0 28 44"><path d="M14 43C14 43 2 28.5 2 18C2 9.2 7.8 3 14 3C20.2 3 26 9.2 26 18C26 28.5 14 43 14 43Z" fill="#7c3aed" stroke="white" stroke-width="2.5"/><circle cx="14" cy="18" r="5" fill="rgba(255,255,255,.55)"/></svg>`,iconSize:[30,47],iconAnchor:[15,47],popupAnchor:[0,-40]});
+      originMarkerRef.current=L.marker([origin[1],origin[0]],{icon:originIcon}).addTo(map).bindPopup('<b>📍 Endereço de origem</b>');
+      map.setView([origin[1],origin[0]],12);
+    }
+  },[origin]);
+
+  // Voar para obra selecionada na tabela
+  useEffect(()=>{
+    if(!selectedObraId||!mapInstanceRef.current)return;
+    const mk=obrasMarkersRef.current.find(m=>m._obraId===selectedObraId);
+    if(mk){
+      const ll=mk.getLatLng();
+      mapInstanceRef.current.flyTo([ll.lat,ll.lng],15,{duration:1.2});
+      setTimeout(()=>mk.openPopup(),800);
+    }
+  },[selectedObraId]);
+
+  return(
+    <div style={{position:'relative',flex:'1 1 0',minHeight:0}}>
+      <div ref={mapRef} style={{width:'100%',height:'100%'}}/>
+      {/* Legenda */}
+      <div style={{position:'absolute',bottom:10,right:10,background:'rgba(255,255,255,.94)',backdropFilter:'blur(6px)',border:'1px solid var(--border)',borderRadius:10,padding:'8px 12px',zIndex:1000,boxShadow:'var(--shadow)'}}>
+        <div style={{fontSize:9.5,fontWeight:800,color:'var(--muted)',marginBottom:5,textTransform:'uppercase',letterSpacing:.5}}>Legenda</div>
+        {[['#f59e0b','Corte'],['#0ea5e9','Caminhão'],['#10b981','Entulho'],['#ef4444','Aterros'],['#7c3aed','Origem']].map(([c,l])=>(
+          <div key={l} style={{display:'flex',alignItems:'center',gap:5,marginBottom:2.5}}>
+            <span style={{width:9,height:9,borderRadius:'50%',background:c,display:'inline-block',flexShrink:0}}/>
+            <span style={{fontSize:10.5,color:'var(--text)'}}>{l}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   EXPORT PDF
+══════════════════════════════════════════════════════════════════════════════ */
+async function gerarPDF(form,destinos,obras){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF('l','mm','a4');
+  const pw=doc.internal.pageSize.getWidth();
+  const ph=doc.internal.pageSize.getHeight();
+  const now=new Date().toLocaleString('pt-BR');
+
+  // Cabeçalho
+  doc.setFillColor(248,250,252);doc.rect(0,0,pw,ph,'F');
+  doc.setFillColor(241,85,0);doc.rect(0,0,pw,18,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont(undefined,'bold');
+  doc.text('RELATÓRIO — CALC. TERRA',pw/2,11,{align:'center'});
+
+  // Info da obra
+  doc.setFillColor(255,255,255);doc.roundedRect(8,22,pw-16,22,3,3,'F');
+  doc.setDrawColor(226,232,240);doc.roundedRect(8,22,pw-16,22,3,3,'S');
+  doc.setTextColor(30,41,59);doc.setFontSize(9);doc.setFont(undefined,'bold');
+  doc.text('OBRA',12,29);doc.text('ENDEREÇO',80,29);doc.text('DATA DA CONSULTA',170,29);doc.text('ZONA / EQUIPAMENTO',220,29);
+  doc.setFont(undefined,'normal');doc.setTextColor(100,116,139);
+  doc.text(form.nomeObra||'—',12,35,{maxWidth:60});
+  doc.text(form.endereco||'—',80,35,{maxWidth:80});
+  doc.text(now,170,35,{maxWidth:40});
+  doc.text(`${form.zona} / ${form.equipamento}`,220,35,{maxWidth:60});
+
+  // Tabela Destinos
+  doc.setFontSize(9);doc.setFont(undefined,'bold');doc.setTextColor(3,105,161);
+  doc.text('PRINCIPAIS DESTINOS',8,52);
+  doc.autoTable({
+    startY:55,
+    head:[['Destino','Status','Distância','Duração','DMT','Preço','+ 3km','+ 5km']],
+    body:destinos.map(r=>[r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7]]),
+    styles:{fontSize:8,cellPadding:3,lineColor:[241,245,249],lineWidth:.3},
+    headStyles:{fillColor:[240,249,255],textColor:[3,105,161],fontStyle:'bold',fontSize:8},
+    alternateRowStyles:{fillColor:[248,250,252]},
+    columnStyles:{0:{fontStyle:'bold'},2:{halign:'right'},3:{halign:'right'},4:{halign:'right'},5:{halign:'right'},6:{halign:'right'},7:{halign:'right'}},
+    margin:{left:8,right:8},
+  });
+
+  // Tabela Obras
+  const y1=doc.lastAutoTable.finalY+8;
+  doc.setFontSize(9);doc.setFont(undefined,'bold');doc.setTextColor(5,150,105);
+  doc.text('OBRAS LAND PRÓXIMAS',8,y1);
+  doc.autoTable({
+    startY:y1+3,
+    head:[['#','Obra','Cliente','Distância','Cidade','Bairro','Tipo','Última Rota','Qtd Rotas']],
+    body:obras.map((o,i)=>[`${i+1}°`,o.obra_nome,o.cliente||'—',`${o._d.toFixed(1)} km`,o.city||'—',o.neighborhood||'—',volLabel(o.volume_type_raw),fmtDate(o.ultima_data_rota),(o.rotas||[]).length]),
+    styles:{fontSize:8,cellPadding:3,lineColor:[241,245,249],lineWidth:.3},
+    headStyles:{fillColor:[240,253,244],textColor:[5,150,105],fontStyle:'bold',fontSize:8},
+    alternateRowStyles:{fillColor:[248,250,252]},
+    columnStyles:{0:{fontStyle:'bold',halign:'center',cellWidth:10},3:{halign:'right'},8:{halign:'center'}},
+    margin:{left:8,right:8},
+  });
+
+  // Footer
+  doc.setFontSize(7);doc.setTextColor(148,163,184);
+  doc.text(`Gerado em ${now} · LandApp Plataforma 360`,pw/2,ph-5,{align:'center'});
+
+  const nomeArq=`CalcTerra_${(form.nomeObra||'consulta').replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.pdf`;
+  doc.save(nomeArq);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   APP PRINCIPAL
+══════════════════════════════════════════════════════════════════════════════ */
+function App(){
+  const winW=useWindowWidth();
+  const isSmall=winW<860;   // tablet/pequeno: 1 coluna
+  const isMini=winW<640;    // celular: form compacto total
+
+  const [form,setForm]=useState({nomeObra:'',zona:'Sul',equipamento:'Grande Porte',regiao:'Bairro',endereco:''});
+  const [state,setState]=useState({loading:false,error:null,destinos:[],obras:[],origin:null,destinosCoords:[],ts:null});
+  const [allObras,setAllObras]=useState([]);
+  const [pendingFilters,setPendingFilters]=useState(EMPTY_FILTERS);
+  const [appliedFilters,setAppliedFilters]=useState(EMPTY_FILTERS);
+  const [selectedObraId,setSelectedObraId]=useState(null);
+  const [filterOpen,setFilterOpen]=useState(true); // toggle filtros em telas pequenas
+
+  // Carregar OBRAS
+  useEffect(()=>{
+    const load=()=>{if(window.__OBRAS__?.length){setAllObras(window.__OBRAS__);}};
+    if(window.__OBRAS__?.length){load();}
+    else{window.addEventListener('obras-ready',load,{once:true});return()=>window.removeEventListener('obras-ready',load);}
+  },[]);
+
+  // Obras filtradas para o mapa (aplica filtros do painel)
+  const filteredMapObras=useMemo(()=>{
+    return allObras.filter(o=>{
+      const f=appliedFilters;
+      if(f.cliente&&o.cliente!==f.cliente)return false;
+      if(f.obraNome&&o.obra_nome!==f.obraNome)return false;
+      if(f.tipo&&f.tipo!=='Todos'){
+        if(f.tipo==='Corte'&&!o.volume_type_raw?.includes('CUT'))return false;
+        if(f.tipo==='Caminhão'&&!o.volume_type_raw?.includes('TRUCK'))return false;
+        if(f.tipo==='Entulho'&&!o.volume_type_raw?.includes('RUBBLE'))return false;
+      }
+      if(f.regiao&&f.regiao!=='Todas'&&o.region?.toUpperCase()!==f.regiao.toUpperCase())return false;
+      if(f.bairro&&o.neighborhood!==f.bairro)return false;
+      if(f.destino){const hd=(o.rotas||[]).some(r=>r.destino_nome===f.destino);if(!hd)return false;}
+      if(f.dataInicio){const d=new Date(o.ultima_data_rota);if(isNaN(d)||d<new Date(f.dataInicio))return false;}
+      if(f.dataFim){const d=new Date(o.ultima_data_rota);if(isNaN(d)||d>new Date(f.dataFim+'T23:59:59'))return false;}
+      return true;
+    });
+  },[allObras,appliedFilters]);
+
+  // Opções para dropdowns de filtro (valores únicos do dataset)
+  const filterOptions=useMemo(()=>({
+    clientes:[...new Set(allObras.map(o=>o.cliente).filter(Boolean))].sort(),
+    obraNames:[...new Set(allObras.map(o=>o.obra_nome).filter(Boolean))].sort(),
+    destinos:[...new Set(allObras.flatMap(o=>(o.rotas||[]).map(r=>r.destino_nome)).filter(Boolean))].sort(),
+    bairros:[...new Set(allObras.map(o=>o.neighborhood).filter(Boolean))].sort(),
+  }),[allObras]);
+
+  // Obras para o mapa: padrão = 10 mais próximas; com filtros = filtradas
+  const hasActiveFilters=Object.values(appliedFilters).some(v=>v&&v!=='Todos'&&v!=='Todas');
+  const mapObras=hasActiveFilters?filteredMapObras:state.obras;
+
+  const calcular=useCallback(async()=>{
+    const end=form.endereco.trim();
+    if(!end||state.loading)return;
+    setState(s=>({...s,loading:true,error:null}));
+    try{
+      const origin=await geocode(end);
+
+      // Calcular destinos (OpenRouteService)
+      const destinosCalc=[];
+      const destinosCoords=[];
+      for(const d of DESTINOS_LIST){
+        try{
+          const res=await fetch('https://api.openrouteservice.org/v2/directions/driving-car',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':ORS_KEY},
+            body:JSON.stringify({coordinates:[origin,d.coord]})
+          });
+          const data=await res.json();
+          const km=(data.routes[0].summary.distance/1000);
+          const min=Math.round(data.routes[0].summary.duration/60);
+          let dmt=(DMT_TABLE[d.nome]?.[form.zona])||1.2;
+          if(form.regiao==='Bairro')dmt+=0.05;
+          if(form.equipamento==='Pequeno Porte')dmt+=0.15;
+          const preco=km*dmt;
+          const rota=`https://www.google.com/maps/dir/${origin[1]},${origin[0]}/${d.coord[1]},${d.coord[0]}`;
+          destinosCalc.push([d.nome,d.status,`${km.toFixed(2)} km`,`${min} min`,dmt.toFixed(2),fmtBRL(preco),fmtBRL((km+3)*dmt),fmtBRL((km+5)*dmt),rota]);
+          destinosCoords.push({nome:d.nome,coord:d.coord});
+        }catch(e){console.warn('Route error:',d.nome,e);}
+      }
+
+      // Calcular obras próximas
+      const top3=allObras.filter(o=>Number.isFinite(o.lat)&&Number.isFinite(o.lng))
+        .map(o=>({...o,_d:distKm(origin[1],origin[0],o.lat,o.lng)}))
+        .sort((a,b)=>a._d-b._d).slice(0,10);
+
+      setState({loading:false,error:null,destinos:destinosCalc,obras:top3,origin,destinosCoords,ts:new Date()});
+    }catch(err){
+      setState(s=>({...s,loading:false,error:err.message}));
+    }
+  },[form,state.loading,allObras]);
+
+  const hasResults=state.destinos.length>0||state.obras.length>0;
+  const card={background:'var(--card)',borderRadius:12,border:'1px solid var(--border)',boxShadow:'var(--shadow)',overflow:'hidden'};
+
+  return(
+    <div style={{display:'flex',flexDirection:'column',height:'100vh',overflow:'hidden'}}>
+      <Header onReset={()=>setState({loading:false,error:null,destinos:[],obras:[],origin:null,destinosCoords:[],ts:null})} hasResults={hasResults}/>
+
+      {/* Form compacto quando há resultados */}
+      {hasResults&&<FormPanel form={form} onChange={setForm} onCalc={calcular} onPDF={hasResults?()=>gerarPDF(form,state.destinos,state.obras):null} loading={state.loading} compact/>}
+
+      {/* Área principal */}
+      <div style={{flex:1,overflow:'hidden',display:'flex',flexDirection:'column'}}>
+        {!hasResults&&!state.loading?(
+          <FormPanel form={form} onChange={setForm} onCalc={calcular} loading={state.loading}/>
+        ):(
+          <div style={{display:'flex',flexDirection:'column',flex:1,overflow:'hidden'}}>
+            {/* Tabelas */}
+            <div style={{flex:'0 0 auto',overflow:'auto',maxHeight:isSmall?'50%':'55%',padding:'16px 16px 0'}}>
+              {state.error&&(
+                <div style={{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:10,padding:'12px 16px',marginBottom:12,color:'#b91c1c',fontSize:13,display:'flex',alignItems:'center',gap:8}}><i className="fas fa-exclamation-circle"/>{state.error}</div>
+              )}
+              {state.loading&&(
+                <div style={{textAlign:'center',padding:40,color:'var(--muted)'}}>
+                  <div style={{width:36,height:36,border:'3px solid #e2e8f0',borderTopColor:'#f15500',borderRadius:'50%',animation:'spin .7s linear infinite',margin:'0 auto 12px'}}/>
+                  <div style={{fontSize:13,fontWeight:600}}>Calculando rotas e obras próximas…</div>
+                  <div style={{fontSize:11,marginTop:4}}>Isso pode levar alguns segundos</div>
+                </div>
+              )}
+              {hasResults&&!state.loading&&(
+                <>
+                  {/* Duas colunas — colapsa para 1 coluna em telas pequenas via CSS */}
+                  <div className="terra-grid-2 anim-fade-up">
+                    {/* Destinos */}
+                    <div style={card}>
+                      <div style={{padding:'12px 14px 10px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:7}}>
+                          <div style={{width:28,height:28,borderRadius:7,background:'#eff6ff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14}}>🏭</div>
+                          <div>
+                            <div style={{fontSize:13,fontWeight:800,color:'var(--text)'}}>Principais Destinos</div>
+                            <div style={{fontSize:11,color:'var(--muted)'}}>{state.destinos.length} aterros calculados</div>
+                          </div>
+                        </div>
+                      </div>
+                      <TabelaDestinos rows={state.destinos}/>
+                    </div>
+
+                    {/* Obras próximas */}
+                    <div style={card}>
+                      <div style={{padding:'12px 14px 10px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:7}}>
+                          <div style={{width:28,height:28,borderRadius:7,background:'#f0fdf4',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14}}>🏗️</div>
+                          <div>
+                            <div style={{fontSize:13,fontWeight:800,color:'var(--text)'}}>Obras Land Próximas</div>
+                            <div style={{fontSize:11,color:'var(--muted)'}}>{state.obras.length} obras Terra mais próximas</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{padding:12}}>
+                        <TabelaObras obras={state.obras} onSelect={setSelectedObraId}/>
+                      </div>
+                    </div>
+                  </div>
+
+                </>
+              )}
+            </div>
+
+            {/* Filtros + Mapa */}
+            {hasResults&&!state.loading&&(
+              <div style={{flex:'1 1 0',minHeight:isSmall?180:220,padding:'0 16px 16px',overflow:'hidden',display:'flex'}}>
+                <div style={{flex:1,display:'flex',overflow:'hidden',border:'1px solid var(--border)',borderRadius:12,boxShadow:'var(--shadow)',flexDirection:isSmall?'column':'row'}}>
+                  {/* Botão toggle filtros em telas pequenas */}
+                  {isSmall&&(
+                    <button onClick={()=>setFilterOpen(o=>!o)} style={{flexShrink:0,padding:'8px 14px',background:'#1a2535',border:'none',borderBottom:'1px solid rgba(255,255,255,.08)',color:'#e2e8f0',fontSize:12,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:6,justifyContent:'space-between'}}>
+                      <span style={{display:'flex',alignItems:'center',gap:6}}><i className="fas fa-filter" style={{fontSize:11,color:'#f15500'}}/> Filtros {Object.values(appliedFilters).some(v=>v&&v!=='Todos'&&v!=='Todas')&&<span style={{background:'#f15500',color:'#fff',borderRadius:20,padding:'1px 7px',fontSize:10,fontWeight:800}}>ativos</span>}</span>
+                      <span style={{fontSize:11,opacity:.7}}>{filterOpen?'▴':'▾'}</span>
+                    </button>
+                  )}
+                  {/* Painel de filtros: visível sempre (desktop) ou quando toggle ativo (mobile) */}
+                  {(!isSmall||filterOpen)&&(
+                    <FilterPanel
+                      filters={appliedFilters}
+                      pending={pendingFilters}
+                      onChange={setPendingFilters}
+                      onApply={()=>{setAppliedFilters({...pendingFilters});if(isSmall)setFilterOpen(false);}}
+                      onClear={()=>{setPendingFilters(EMPTY_FILTERS);setAppliedFilters(EMPTY_FILTERS);}}
+                      total={allObras.length}
+                      filtered={filteredMapObras.length}
+                      filterOptions={filterOptions}
+                      compact={isSmall}
+                    />
+                  )}
+                  <MapPanel obras={mapObras} origin={state.origin} aterros={DESTINOS_LIST} selectedObraId={selectedObraId}/>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

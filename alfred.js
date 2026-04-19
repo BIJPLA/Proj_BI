@@ -21,7 +21,7 @@ function closeAllPanels() {
     _alfredState.open = false;
   }
   // Fechar ferramentas
-  ['landcalcPanel', 'landmapPanel'].forEach(id => {
+  ['landcalcPanel', 'landmapPanel', 'landterraPanel'].forEach(id => {
     const p = document.getElementById(id);
     if (p && p.style.display !== 'none') {
       p.classList.remove('acp-visible');
@@ -33,8 +33,9 @@ window.closeAllPanels = closeAllPanels;
 
 // ─── Abrir / fechar ferramentas (Calculadora e LandMap) ──────────────────────
 const _toolSrcs = {
-  landcalc: `apps/Land_Calc_Embed/index.html?v=${Date.now()}`,
-  landmap:  'Mapa_Obras_Projeto/index.html'
+  landcalc:  `apps/Land_Calc_Embed/index.html?v=${Date.now()}`,
+  landmap:   'Mapa_Obras_Projeto/index.html',
+  landterra: `apps/Land_Calc_Terra/index.html?v=${Date.now()}`,
 };
 
 function toolOpen(id) {
@@ -290,12 +291,27 @@ function _alfredBuildContext() {
 }
 
 // ─── Ajustar painel quando sidebar recolhe ─────────────────────────────────
+// Lê a largura DEPOIS da transição CSS (220ms) para pegar o valor final correto
+let _adjustTimer = null;
 function alfredAdjustPanel() {
-  if (!_alfredState.open) return;
-  const panel = document.getElementById('alfredChatPanel');
-  const sidebar = document.querySelector('.sidebar');
-  if (!panel || !sidebar) return;
-  panel.style.left = sidebar.offsetWidth + 'px';
+  clearTimeout(_adjustTimer);
+  _adjustTimer = setTimeout(() => {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+    const sw = sidebar.offsetWidth;
+
+    // Alfred
+    if (_alfredState.open) {
+      const panel = document.getElementById('alfredChatPanel');
+      if (panel) panel.style.left = sw + 'px';
+    }
+
+    // Ferramentas abertas
+    ['landcalcPanel', 'landmapPanel', 'landterraPanel'].forEach(id => {
+      const p = document.getElementById(id);
+      if (p && p.style.display !== 'none') p.style.left = sw + 'px';
+    });
+  }, 240); // aguarda o transition da sidebar (220ms) terminar
 }
 
 // ─── Observar mudanças na sidebar ────────────────────────────────────────────
@@ -305,6 +321,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const obs = new MutationObserver(alfredAdjustPanel);
     obs.observe(sidebar, { attributes: true, attributeFilter: ['class', 'style'] });
   }
+
+  // Reajustar ao redimensionar janela
+  window.addEventListener('resize', alfredAdjustPanel);
 
   // Fechar com ESC
   document.addEventListener('keydown', e => {

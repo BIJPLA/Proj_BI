@@ -137,6 +137,10 @@
           <span class="material-symbols-outlined tool-nav-icon">map</span>
           <span class="tool-nav-text">Land Map</span>
         </button>
+        <button class="tool-nav-btn tool-terra" id="landterraBtn" onclick="toolOpen('landterra')">
+          <span class="material-symbols-outlined tool-nav-icon">near_me</span>
+          <span class="tool-nav-text">Calc. Terra</span>
+        </button>
       </div>
 
       <div class="sidebar-section">
@@ -189,6 +193,26 @@
     </div>
     <div class="tool-panel-body">
       <iframe id="landmapIframe" title="Land Map LandApp" frameborder="0" allowfullscreen
+        style="width:100%;height:100%;border:none;border-radius:0;margin:0;min-height:unset;"></iframe>
+    </div>
+  </div>
+
+  <!-- LandTerra Panel (Calculadora Terra) -->
+  <div id="landterraPanel" class="tool-panel" style="display:none" aria-label="Calculadora Terra LandApp">
+    <div class="tool-panel-header">
+      <div class="tool-panel-header-left">
+        <img src="Imagens/Logo_Plataforma_Branco.png" alt="LandApp" class="acp-logo"/>
+        <div class="acp-header-info">
+          <span class="acp-name">Calc. Terra</span>
+          <span class="acp-status"><span class="material-symbols-outlined" style="font-size:13px;color:#e8a020">near_me</span> LandApp App</span>
+        </div>
+      </div>
+      <button class="acp-btn-close" onclick="toolClose('landterra')" title="Fechar">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="tool-panel-body">
+      <iframe id="landterraIframe" title="Calculadora Terra LandApp" frameborder="0" allowfullscreen
         style="width:100%;height:100%;border:none;border-radius:0;margin:0;min-height:unset;"></iframe>
     </div>
   </div>
