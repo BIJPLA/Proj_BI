@@ -1,7 +1,4 @@
-// ─── Dados carregados dinamicamente via API ───────────────────────────────────
-// Substituiu o import estático de data.js — agora vem do banco em tempo real
-let OBRAS = [];
-let ULTIMA_DATA_BASE = null;
+import { OBRAS, ULTIMA_DATA_BASE } from "./data.js";
 
 /** ========= util ========= */
 function norm(s){ return (s ?? "").toString().trim().toLowerCase(); }
@@ -195,15 +192,6 @@ const header = `
         <div><b>Região:</b> ${escapeHtml(obra.region ?? "—")}</div>
         ${dtStr ? `<div><b>Base até:</b> ${escapeHtml(dtStr)}</div>` : ""}
       </div>
-
-      ${obra.aterro_zero
-        ? `<div style="display:inline-flex;align-items:center;gap:6px;background:#fff8e1;border:1px solid #f0b429;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:#b07d00;margin-bottom:8px">
-             <span style="font-size:14px">♻️</span> Aterro Zero — este local já foi usado como destino
-           </div>`
-        : `<div style="display:inline-flex;align-items:center;gap:6px;background:#f0faf4;border:1px solid #40d27f;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:#1e7a40;margin-bottom:8px">
-             <span style="font-size:14px">🟢</span> Aterro Zero — nunca usado como destino
-           </div>`
-      }
   `;
 
   const rotas = Array.isArray(obra.rotas) ? obra.rotas : [];
@@ -494,25 +482,22 @@ function popularDestinos(){
 async function init(){
   setStatus("Carregando obras…");
 
-  // ── 1. Tentar API do banco (dados em tempo real) ──────────────────────────
-  let fonte = "banco";
+  // ── Tentar banco em tempo real ──────────────────────────────────────────────
   try {
-    const res = await fetch("/api/mapa/obras");
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const res  = await fetch("/api/mapa/obras", { signal: AbortSignal.timeout(15000) });
     const data = await res.json();
-    if (!data.ok) throw new Error(data.error || "Resposta inválida");
-
-    OBRAS = Array.isArray(data.obras) ? data.obras : [];
-    ULTIMA_DATA_BASE = data.ultima_data_base ?? null;
+    if (!res.ok || !data.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+    OBRAS             = Array.isArray(data.obras) ? data.obras : [];
+    ULTIMA_DATA_BASE  = data.ultima_data_base ?? null;
+    console.info(`[LandMap] ${OBRAS.length} obras carregadas do banco ✅`);
   } catch (err) {
+    // ── Fallback: data.js local (sempre garante que o mapa funciona) ──────────
     console.warn("[LandMap] API indisponível, usando data.js local:", err.message);
-
-    // ── 2. Fallback: data.js estático (sempre funciona) ─────────────────────
-    fonte = "local";
     try {
-      const mod = await import("./data.js");
-      OBRAS = mod.OBRAS ?? [];
+      const mod        = await import("./data.js");
+      OBRAS            = mod.OBRAS           ?? [];
       ULTIMA_DATA_BASE = mod.ULTIMA_DATA_BASE ?? null;
+      setStatus(`Dados locais (API offline) — ${OBRAS.length} obras`);
     } catch (e2) {
       console.error("[LandMap] data.js também falhou:", e2);
       setStatus("⚠️ Não foi possível carregar as obras.");
@@ -520,11 +505,6 @@ async function init(){
     }
   }
 
-  if (!OBRAS.length) {
-    setStatus("Nenhuma obra encontrada.");
-  }
-
-  // ── 3. Montar filtros e marcadores ────────────────────────────────────────
   popularRegioes();
   popularClientes();
   popularObras();
@@ -541,12 +521,7 @@ async function init(){
 
   readFilters();
   updateMarkersAndList();
-
-  if (fonte === "banco") {
-    setStatus(`Pronto — ${OBRAS.length} obra(s) carregada(s) do banco 😼`);
-  } else {
-    setStatus(`Pronto — ${OBRAS.length} obra(s) (dados locais · API offline)`);
-  }
+  if (OBRAS.length) setStatus("Pronto. Filtros, data da última rota e cores por tipo já estão valendo 😼");
 }
 
 document.getElementById("btnFiltrar").addEventListener("click", aplicarFoco);
