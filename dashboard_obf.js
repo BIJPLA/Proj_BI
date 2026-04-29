@@ -32,8 +32,8 @@
         iframe: `<iframe title="Dashboard - OMIE" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNTAxZjk5YmEtODRhMy00ZWZkLWE2NjktNzNhZWE3YWMxYjBiIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
-        nome: "Auditoria Fretes",
-        iframe: `<iframe title="Auditoria - Fretes" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiZWViODNkNmQtNTBiZC00YTFlLWE0NTYtNjkzOWU1M2IzMWFlIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
+        nome: "Fechamento Fretes",
+        iframe: `<iframe title="Fechamento - Fretes" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiOGZjMzc3MmUtYzBlZi00NTUyLWJkYmUtZDMyNzA2MTVhNzZkIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
         nome: "Auditoria Modal",
@@ -214,7 +214,7 @@ function getIcon(dep) {
   function getDashDesc(nome){
     const map = {
       "Dashboard Medição": "Acompanhamenoto de Medições pelo time de operações ",
-      "Auditoria Fretes": "Revisão das viagens de fretes realizdas.",
+      "Fechamento Fretes": "Revisão das viagens de fretes realizdas.",
       "Auditoria Modal": "Validações e visão por modal / tipo de equipamento.",
       "Forecast": "Projeções e acompanhamento de Obras ( Receita e Volume)",
       "DRE": "Demonstrativo de Resultados com visão gerencial.",
@@ -272,7 +272,7 @@ function getIcon(dep) {
           const b = document.createElement("a");
           b.className = "dashboard-card";
           const iconAndTitle = (function(){if(d.nome=="Dashboard Medição") return `<span class="material-symbols-outlined">square_foot</span> Dashboard Medição `;
-            if(d.nome=="Auditoria Fretes") return `<span class="material-symbols-outlined">fact_check</span> Auditoria Fretes `;
+            if(d.nome=="Fechamento Fretes") return `<span class="material-symbols-outlined">fact_check</span> Fechamento Fretes `;
             if(d.nome=="Auditoria Modal") return `<span class="material-symbols-outlined">alt_route</span> Auditoria Modal`;
             if(d.nome=="Forecast") return `<span class="material-symbols-outlined">trending_up</span> Forecast`;
             if(d.nome=="DRE") return `<span class="material-symbols-outlined">dashboard</span> DRE`;
