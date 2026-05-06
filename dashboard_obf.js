@@ -87,6 +87,10 @@
         iframe: `<iframe title="S&OP 2.0 - Landapp" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYzZhZjlhYWYtODhkZC00NjY3LWE3MTMtZmY2NTY0YzQ1ODU1IiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       },
       {
+        nome: "Fechamento Terra",
+        iframe: `<iframe title="Dashboard - Previa de medição." width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiODAzMzU1M2MtMjQ5MS00NGVmLWIyNWQtZTNhOTcwMjllMWRjIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
+      },
+      {
         nome: "Omie",
         iframe: `<iframe title="Dashboard - Medicao" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNmEyMGIyNzctZGM3Yi00ZjAxLWJiMWUtOTRjYTA2NDk5ZTdmIiwidCI6ImI3NTY3ODk1LTEwY2MtNDliZS05MjQxLTM3ZTU3MjI2NmZlZiJ9" frameborder="0" allowFullScreen="true"></iframe>`
       }
@@ -214,6 +218,7 @@ function getIcon(dep) {
   function getDashDesc(nome){
     const map = {
       "Dashboard Medição": "Acompanhamenoto de Medições pelo time de operações ",
+      "Fechamento Terra": "Revisão das viagens de terra realizadas.",
       "Fechamento Fretes": "Revisão das viagens de fretes realizdas.",
       "Auditoria Modal": "Validações e visão por modal / tipo de equipamento.",
       "Forecast": "Projeções e acompanhamento de Obras ( Receita e Volume)",
@@ -272,6 +277,7 @@ function getIcon(dep) {
           const b = document.createElement("a");
           b.className = "dashboard-card";
           const iconAndTitle = (function(){if(d.nome=="Dashboard Medição") return `<span class="material-symbols-outlined">square_foot</span> Dashboard Medição `;
+            if(d.nome=="Fechamento Terra") return `<span class="material-symbols-outlined">fact_check</span> Fechamento Terra `;
             if(d.nome=="Fechamento Fretes") return `<span class="material-symbols-outlined">fact_check</span> Fechamento Fretes `;
             if(d.nome=="Auditoria Modal") return `<span class="material-symbols-outlined">alt_route</span> Auditoria Modal`;
             if(d.nome=="Forecast") return `<span class="material-symbols-outlined">trending_up</span> Forecast`;
